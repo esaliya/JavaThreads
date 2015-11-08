@@ -141,6 +141,9 @@ public class BCReplica {
                                         threadPartialOutMM[threadIdx]);
                                     timers[threadIdx].stop();
                                 }));
+                        if (worldProcRank == 0){
+                            System.out.println("Done iteration " + itr);
+                        }
                     }
                     else {
                         final CountDownLatch latch = new CountDownLatch(threadCount);
@@ -176,7 +179,9 @@ public class BCReplica {
                         }
                         go.countDown();
                         latch.await();
-
+                        if (worldProcRank == 0){
+                            System.out.println("Done iteration " + itr);
+                        }
                     }
                 }
             } else {
@@ -187,6 +192,9 @@ public class BCReplica {
                     targetDimension, globalColCount,
                     blockSize, threadPartialOutMM[0]);
                 timers[0].stop();
+                if (worldProcRank == 0){
+                    System.out.println("Done iteration " + itr);
+                }
             }
 
             // This is common for both threaded and non thread case
