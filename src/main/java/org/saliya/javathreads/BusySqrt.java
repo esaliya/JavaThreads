@@ -25,10 +25,11 @@ public class BusySqrt implements Runnable{
 
     @Override
     public void run() {
-
-        BitSet bitSet = new BitSet(cores);
-        bitSet.set(threadIdx);
-        Affinity.setAffinity(bitSet);
+        if (bind) {
+            BitSet bitSet = new BitSet(cores);
+            bitSet.set(threadIdx);
+            Affinity.setAffinity(bitSet);
+        }
         compute();
     }
 
