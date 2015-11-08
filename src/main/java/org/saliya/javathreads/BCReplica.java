@@ -24,7 +24,8 @@ public class BCReplica {
     static int blockSize = 64;
     static Stopwatch[] timers;
 
-    public static void main(String[] args) throws MPIException {
+    public static void main(String[] args)
+        throws MPIException, InterruptedException {
         args = MPI.Init(args);
         Intracomm worldProcComm = MPI.COMM_WORLD;
         int worldProcRank = worldProcComm.getRank();
@@ -62,23 +63,52 @@ public class BCReplica {
             IntStream.range(0,threadCount).forEach(t -> timers[t] = Stopwatch.createUnstarted());
 
             if (threadCount > 1){
-                launchHabaneroApp(
-                    () -> forallChunked(
-                        0, threadCount - 1,
-                        (threadIdx) -> {
-                            if (bind){
-                                BitSet bitSet = new BitSet(coreCount);
-                                bitSet.set(threadIdx);
-                                Affinity.setAffinity(bitSet);
-                            }
-                            timers[threadIdx].start();
-                            MatrixUtils.matrixMultiply(
-                                threadPartialBofZ[threadIdx], preX,
-                                rowCountPerUnit,
-                                targetDimension, globalColCount,
-                                blockSize, threadPartialOutMM[threadIdx]);
-                            timers[threadIdx].stop();
-                        }));
+                if (useHJ) {
+                    launchHabaneroApp(
+                        () -> forallChunked(
+                            0, threadCount - 1, (threadIdx) -> {
+                                if (bind) {
+                                    BitSet bitSet = new BitSet(coreCount);
+                                    bitSet.set(threadIdx);
+                                    Affinity.setAffinity(bitSet);
+                                }
+                                timers[threadIdx].start();
+                                MatrixUtils.matrixMultiply(
+                                    threadPartialBofZ[threadIdx], preX,
+                                    rowCountPerUnit, targetDimension,
+                                    globalColCount, blockSize,
+                                    threadPartialOutMM[threadIdx]);
+                                timers[threadIdx].stop();
+                            }));
+                } else {
+                    final CountDownLatch latch = new CountDownLatch(threadCount);
+                    final CountDownLatch go = new CountDownLatch(1);
+                    for (int i = 0; i < threadCount; ++i){
+                        final int threadIdx = i;
+                        new Thread(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        go.await();
+                                        timers[threadIdx].start();
+                                        MatrixUtils.matrixMultiply(
+                                            threadPartialBofZ[threadIdx], preX,
+                                            rowCountPerUnit, targetDimension,
+                                            globalColCount, blockSize,
+                                            threadPartialOutMM[threadIdx]);
+                                        timers[threadIdx].stop();
+                                        latch.countDown();
+                                    }
+                                    catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+                    }
+                    go.countDown();
+                    latch.await();
+                }
             } else {
                 timers[0].start();
                 MatrixUtils.matrixMultiply(
@@ -92,6 +122,7 @@ public class BCReplica {
             // This is common for both threaded and non thread case
             for (int t = 0; t < threadCount; ++t){
                 time+= timers[t].elapsed(TimeUnit.MILLISECONDS);
+                timers[t].reset();
             }
             avgTime += (time *1.0 / threadCount);
         }
