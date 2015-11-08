@@ -120,7 +120,7 @@ public class BCReplica {
                         readyToGo.compareAndSet(false, true);
 
                         if (worldProcRank == 0){
-                            System.out.println("LRT - JavaT - Done iteration " + itr);
+                            System.out.println("LRT - JavaT - " + (bind ? "Bound" : "Unbound") + " - Done iteration " + itr);
                         }
                     }
                 } else {
@@ -142,7 +142,7 @@ public class BCReplica {
                                     timers[threadIdx].stop();
                                 }));
                         if (worldProcRank == 0){
-                            System.out.println("No LRT - HJ - Done iteration " + itr);
+                            System.out.println("No LRT - HJ - " + (bind ? "Bound" : "Unbound") + " - Done iteration " + itr);
                         }
                     }
                     else {
@@ -180,7 +180,7 @@ public class BCReplica {
                         go.countDown();
                         latch.await();
                         if (worldProcRank == 0){
-                            System.out.println("No LRT - Java T - Done iteration " + itr);
+                            System.out.println("No LRT - Java T - " + (bind ? "Bound" : "Unbound") + " - Done iteration " + itr);
                         }
                     }
                 }
@@ -193,7 +193,7 @@ public class BCReplica {
                     blockSize, threadPartialOutMM[0]);
                 timers[0].stop();
                 if (worldProcRank == 0){
-                    System.out.println("No LRT - No Java T - MPI - Done iteration " + itr);
+                    System.out.println("No LRT - No Java T - MPI - " + (bind ? "Bound" : "Unbound") + " - Done iteration " + itr);
                 }
             }
 
