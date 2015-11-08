@@ -55,7 +55,7 @@ public class BCReplica {
         AtomicBoolean workToDo = new AtomicBoolean(false);
         AtomicBoolean readyToGo = new AtomicBoolean(true);
         AtomicBoolean done = new AtomicBoolean(false);
-        if (lrt){
+        if (threadCount > 1 && lrt){
             if (!useHJ){
                 for (int i = 0; i < threadCount; ++i){
                     final int threadIdx = i;
@@ -112,6 +112,10 @@ public class BCReplica {
                         lrtLatch[0] = new CountDownLatch(threadCount);
                         workToDo.compareAndSet(true, false);
                         readyToGo.compareAndSet(false, true);
+
+                        if (worldProcRank == 0){
+                            System.out.println("Done iteration " + iterations);
+                        }
                     }
                 } else {
                     if (useHJ) {
@@ -192,7 +196,7 @@ public class BCReplica {
         }
 
         // Shutdown long running threads if any
-        if (lrt){
+        if (threadCount > 1 && lrt){
             if (!useHJ){
                 done.compareAndSet(false, true);
                 workToDo.compareAndSet(false, true);
