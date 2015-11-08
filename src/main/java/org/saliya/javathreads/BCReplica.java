@@ -65,7 +65,8 @@ public class BCReplica {
                             public void run() {
                                 if (bind) {
                                     BitSet bitSet = new BitSet(coreCount);
-                                    bitSet.set(threadIdx);
+                                    // TODO - here assuming #threads < #cores and only 1 proc when threads are running
+                                    bitSet.set(threadIdx+1);
                                     Affinity.setAffinity(bitSet);
                                 }
                                 while (!done.get()) {
