@@ -40,7 +40,7 @@ public class BCReplica {
 
         boolean lrt = args.length > 5 && Boolean.parseBoolean(args[5]);
 
-        final int globalColCount = args.length > 6 ? Integer.parseInt(args[7]) : 50000;
+        final int globalColCount = args.length > 6 ? Integer.parseInt(args[6]) : 50000;
         final int totalComputingUnits = args.length > 7 ? Integer.parseInt(args[7]) : 24 * 20;
 
         int rowCountPerUnit = globalColCount/ totalComputingUnits;
