@@ -103,5 +103,6 @@ public class BCReplica {
             System.out.println("Average Time " + (avgTime / (iterations*worldProcCount)) + " "
                                + "ms");
         }
+        MPI.Finalize();
     }
 }
