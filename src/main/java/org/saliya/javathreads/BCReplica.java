@@ -114,7 +114,7 @@ public class BCReplica {
                         readyToGo.compareAndSet(false, true);
 
                         if (worldProcRank == 0){
-                            System.out.println("Done iteration " + iterations);
+                            System.out.println("Done iteration " + itr);
                         }
                     }
                 } else {
