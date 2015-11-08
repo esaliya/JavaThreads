@@ -55,6 +55,8 @@ public class BCReplica {
                     }));
             IntStream.range(0,threadCount).forEach(t -> IntStream.range(0, rowCountPerUnit).forEach(r -> IntStream.range(0, globalColCount).forEach(c -> {
                             threadPartialBofZ[t][r][c] = Math.random();
+                        })));
+            IntStream.range(0,threadCount).forEach(t -> IntStream.range(0, rowCountPerUnit).forEach(r -> IntStream.range(0, targetDimension).forEach(c -> {
                             threadPartialOutMM[t][r][c] = 0.0;
                         })));
             IntStream.range(0,threadCount).forEach(t -> timers[t] = Stopwatch.createUnstarted());
