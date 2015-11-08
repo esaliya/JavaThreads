@@ -130,7 +130,7 @@ public class BCReplica {
                                 0, threadCount - 1, (threadIdx) -> {
                                     if (bind) {
                                         BitSet bitSet = new BitSet(coreCount);
-                                        bitSet.set(threadIdx);
+                                        bitSet.set(threadIdx+1);
                                         Affinity.setAffinity(bitSet);
                                     }
                                     timers[threadIdx].start();
@@ -156,7 +156,7 @@ public class BCReplica {
                                     public void run() {
                                         if (bind) {
                                             BitSet bitSet = new BitSet(coreCount);
-                                            bitSet.set(threadIdx);
+                                            bitSet.set(threadIdx+1);
                                             Affinity.setAffinity(bitSet);
                                         }
                                         try {
