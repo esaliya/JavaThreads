@@ -63,6 +63,11 @@ public class BCReplica {
                         new Runnable() {
                             @Override
                             public void run() {
+                                if (bind) {
+                                    BitSet bitSet = new BitSet(coreCount);
+                                    bitSet.set(threadIdx);
+                                    Affinity.setAffinity(bitSet);
+                                }
                                 while (!done.get()) {
                                     while (!workToDo.get()) {/*busy wait*/}
                                     if (done.get()){
@@ -145,6 +150,11 @@ public class BCReplica {
                                 new Runnable() {
                                     @Override
                                     public void run() {
+                                        if (bind) {
+                                            BitSet bitSet = new BitSet(coreCount);
+                                            bitSet.set(threadIdx);
+                                            Affinity.setAffinity(bitSet);
+                                        }
                                         try {
                                             go.await();
                                             timers[threadIdx].start();
