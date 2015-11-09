@@ -39,9 +39,12 @@ public class BCReplica {
         int iterations = Integer.parseInt(args[4]);
 
         boolean lrt = args.length > 5 && Boolean.parseBoolean(args[5]);
+        int shift = args.length > 6 ? Integer.parseInt(args[6]) : 0;
+        int tpc = args.length > 7 ? Integer.parseInt(args[7]) : 0;
 
-        final int globalColCount = args.length > 6 ? Integer.parseInt(args[6]) : 50000;
-        final int totalComputingUnits = args.length > 7 ? Integer.parseInt(args[7]) : 24 * 20;
+        int tmpNextIdx = 8;
+        final int globalColCount = args.length > tmpNextIdx ? Integer.parseInt(args[tmpNextIdx]) : 50000;
+        final int totalComputingUnits = args.length > tmpNextIdx+1 ? Integer.parseInt(args[tmpNextIdx+1]) : 24 * 20;
 
         int rowCountPerUnit = globalColCount/ totalComputingUnits;
 
@@ -156,7 +159,9 @@ public class BCReplica {
                                     public void run() {
                                         if (bind) {
                                             BitSet bitSet = new BitSet(coreCount);
+                                            // TODO - let's hard code for juliet for now
                                             bitSet.set(threadIdx+1);
+                                            bitSet.set(threadIdx+1+24);
                                             Affinity.setAffinity(bitSet);
                                         }
                                         try {

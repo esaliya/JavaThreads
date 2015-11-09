@@ -27,7 +27,9 @@ public class BusySqrt implements Runnable{
     public void run() {
         if (bind) {
             BitSet bitSet = new BitSet(cores);
-            bitSet.set(threadIdx);
+            // TODO - let's hard code for juliet for now
+            bitSet.set(threadIdx+1);
+            bitSet.set(threadIdx+1+24);
             Affinity.setAffinity(bitSet);
         }
         compute();
