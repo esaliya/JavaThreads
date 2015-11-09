@@ -1,0 +1,25 @@
+No LRT - HJ - Bound
+./runbcreplica.sh 23 1 true core false true
+Average Time 149.40434782608696 ms
+
+
+No LRT - Java T - Bound
+./runbcreplica.sh 23 1 false core false true
+Average Time 128.80434782608694 ms
+
+
+LRT - JavaT - Bound
+./runbcreplica.sh 23 1 false core true true
+Average Time 150.9913043478261 ms
+
+
+LRT - No Java T - MPI - Bound
+./runbcreplica.sh 1 23 false core true true
+Average Time 122.50434782608696 ms
+(also this is so fast in terms of total time)
+
+
+No LRT - HJ - Unbound
+./runbcreplica.sh 23 1 true none false false
+Average Time 178.11304347826092 ms
+(the usual we run in damds)
