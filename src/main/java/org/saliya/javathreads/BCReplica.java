@@ -87,8 +87,10 @@ public class BCReplica {
                                     }
 
                                     try {
-                                        String pid = Utils.getPid();
-                                        System.out.println("Thread " + threadIdx + " pid=" + pid + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                        final int threadId = Affinity
+                                            .getThreadId();
+                                        System.out.println("Thread " + threadIdx + " thread PID FromAffinityLibrary=" + threadId
+                                                           + " affinity=" + Utils.getProcAffinityMask(threadId));
                                     }
                                     catch (IOException e) {
                                         e.printStackTrace();
@@ -153,8 +155,10 @@ public class BCReplica {
                                         Affinity.setAffinity(bitSet);
                                     }
                                     try {
-                                        String pid = Utils.getPid();
-                                        System.out.println("Thread " + threadIdx + " pid=" + pid + " threadIdFromAffinityLibrary=" + Affinity.getThreadId() + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                        final int threadId = Affinity
+                                            .getThreadId();
+                                        System.out.println("Thread " + threadIdx + " thread PID FromAffinityLibrary=" + threadId
+                                                           + " affinity=" + Utils.getProcAffinityMask(threadId));
                                     }
                                     catch (IOException e) {
                                         e.printStackTrace();
@@ -191,8 +195,10 @@ public class BCReplica {
                                         try {
                                             go.await();
                                             try {
-                                                String pid = Utils.getPid();
-                                                System.out.println("Thread " + threadIdx + " pid=" + pid + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                                final int threadId = Affinity
+                                                    .getThreadId();
+                                                System.out.println("Thread " + threadIdx + " thread PID FromAffinityLibrary=" + threadId
+                                                                   + " affinity=" + Utils.getProcAffinityMask(threadId));
                                             }
                                             catch (IOException e) {
                                                 e.printStackTrace();
