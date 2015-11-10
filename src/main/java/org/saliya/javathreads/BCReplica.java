@@ -5,7 +5,11 @@ import mpi.Intracomm;
 import mpi.MPI;
 import mpi.MPIException;
 import net.openhft.affinity.Affinity;
+import net.openhft.affinity.AffinityStrategies;
+import net.openhft.affinity.AffinitySupport;
+import net.openhft.affinity.AffinityThreadFactory;
 
+import java.io.IOException;
 import java.nio.DoubleBuffer;
 import java.util.BitSet;
 import java.util.concurrent.CountDownLatch;
@@ -27,6 +31,7 @@ public class BCReplica {
 
     public static void main(String[] args)
         throws MPIException, InterruptedException {
+        AffinitySupport.setThreadId();
         args = MPI.Init(args);
         Intracomm worldProcComm = MPI.COMM_WORLD;
         int worldProcRank = worldProcComm.getRank();
@@ -81,6 +86,13 @@ public class BCReplica {
                                         return;
                                     }
 
+                                    try {
+                                        String pid = Utils.getPid();
+                                        System.out.println("Thread " + threadIdx + " pid=" + pid + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                    }
+                                    catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                     timers[threadIdx].start();
                                     MatrixUtils.matrixMultiply(
                                         threadPartialBofZ[threadIdx], preX,
@@ -140,6 +152,14 @@ public class BCReplica {
                                         bitSet.set(threadIdx+1+24);
                                         Affinity.setAffinity(bitSet);
                                     }
+                                    try {
+                                        String pid = Utils.getPid();
+                                        System.out.println("Thread " + threadIdx + " pid=" + pid + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                    }
+                                    catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    System.out.println();
                                     timers[threadIdx].start();
                                     MatrixUtils.matrixMultiply(
                                         threadPartialBofZ[threadIdx], preX,
@@ -170,6 +190,13 @@ public class BCReplica {
                                         }
                                         try {
                                             go.await();
+                                            try {
+                                                String pid = Utils.getPid();
+                                                System.out.println("Thread " + threadIdx + " pid=" + pid + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                            }
+                                            catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
                                             timers[threadIdx].start();
                                             MatrixUtils.matrixMultiply(
                                                 threadPartialBofZ[threadIdx],
