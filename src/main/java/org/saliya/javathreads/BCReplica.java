@@ -154,7 +154,7 @@ public class BCReplica {
                                     }
                                     try {
                                         String pid = Utils.getPid();
-                                        System.out.println("Thread " + threadIdx + " pid=" + pid + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
+                                        System.out.println("Thread " + threadIdx + " pid=" + pid + " threadIdFromAffinityLibrary=" + Affinity.getThreadId() + " affinity=" + Utils.getProcAffinityMask(Integer.parseInt(pid)));
                                     }
                                     catch (IOException e) {
                                         e.printStackTrace();
