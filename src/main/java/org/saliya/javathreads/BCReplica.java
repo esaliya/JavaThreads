@@ -69,7 +69,9 @@ public class BCReplica {
                                 if (bind) {
                                     BitSet bitSet = new BitSet(coreCount);
                                     // TODO - here assuming #threads < #cores and only 1 proc when threads are running
+                                    // TODO - let's hard code for juliet for now
                                     bitSet.set(threadIdx+1);
+                                    bitSet.set(threadIdx+1+24);
                                     Affinity.setAffinity(bitSet);
                                 }
                                 while (!done.get()) {
@@ -133,7 +135,9 @@ public class BCReplica {
                                 0, threadCount - 1, (threadIdx) -> {
                                     if (bind) {
                                         BitSet bitSet = new BitSet(coreCount);
+                                        // TODO - let's hard code for juliet for now
                                         bitSet.set(threadIdx+1);
+                                        bitSet.set(threadIdx+1+24);
                                         Affinity.setAffinity(bitSet);
                                     }
                                     timers[threadIdx].start();
