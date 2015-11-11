@@ -70,7 +70,10 @@ public class BCReplicaSimple {
                             threadPartialOutMM[threadIdx]);*/
 
                         // Note - now what if we replace matrix multiply with busysqrt
-                        busySqrt(busySqrtResults, threadIdx);
+                        /*busySqrt(busySqrtResults, threadIdx);*/
+
+                        // Note - now see with naive MM
+                        naiveMM(threadPartialBofZ[threadIdx], preX, threadPartialOutMM[threadIdx], rowCountPerUnit, globalColCount, targetDimension);
                         timers[threadIdx].stop();
                     }));
             hjAppTimer.stop();
@@ -110,5 +113,15 @@ public class BCReplicaSimple {
             x = Math.sqrt(x*Math.random()*1.e10);
         }
         results[threadIdx] = x;
+    }
+
+    private static void naiveMM(double[][]A, double[][]B, double[][]C, int rows, int common, int cols) {
+        for (int i = 0; i < rows; ++i){
+            for (int j = 0; j < cols; ++j){
+                for (int k = 0; k < common; ++k){
+                    C[i][j] += A[i][k]*B[k][j];
+                }
+            }
+        }
     }
 }
