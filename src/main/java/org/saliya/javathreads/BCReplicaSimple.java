@@ -120,7 +120,8 @@ public class BCReplicaSimple {
             for (int j = 0; j < cols; ++j){
                 for (int k = 0; k < common; ++k){
 //                    C[i][j] += A[i][k]*B[k][j];
-                    C[i][j] += Math.sqrt(Math.random());
+//                    C[i][j] += Math.sqrt(Math.random());
+                    C[i][j] += A[i][k];
                 }
             }
         }
