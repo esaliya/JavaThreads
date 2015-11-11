@@ -22,6 +22,8 @@ public class BCReplicaSimple {
     static int blockSize = 64;
     static Stopwatch[] timers;
 
+    static double[] busySqrtResults;
+
     public static void main(String[] args) {
         int threadCount = Integer.parseInt(args[0]);
         int iterations = Integer.parseInt(args[1]);
@@ -33,6 +35,8 @@ public class BCReplicaSimple {
         threadPartialOutMM = new double[threadCount][rowCountPerUnit][targetDimension];
         threadPartialBofZ = new double[threadCount][rowCountPerUnit][globalColCount];
         timers = new Stopwatch[threadCount];
+
+        busySqrtResults = new double[threadCount];
 
         Stopwatch miscTimer = Stopwatch.createUnstarted();
         Stopwatch hjAppTimer = Stopwatch.createUnstarted();
@@ -60,10 +64,13 @@ public class BCReplicaSimple {
                 () -> forallChunked(
                     0, threadCount - 1, (threadIdx) -> {
                         timers[threadIdx].start();
-                        MatrixUtils.matrixMultiply(
+                        /*MatrixUtils.matrixMultiply(
                             threadPartialBofZ[threadIdx], preX, rowCountPerUnit,
                             targetDimension, globalColCount, blockSize,
-                            threadPartialOutMM[threadIdx]);
+                            threadPartialOutMM[threadIdx]);*/
+
+                        // Note - now what if we replace matrix multiply with busysqrt
+                        busySqrt(busySqrtResults, threadIdx);
                         timers[threadIdx].stop();
                     }));
             hjAppTimer.stop();
@@ -95,5 +102,13 @@ public class BCReplicaSimple {
             + " ms hjAppTimeTotal: " + hjAppTime + " ms miscTimeTotal: "
             + miscTime + " ms SumOfCompsTotal: " + sumOfCompsTotal
             + " ms AnyOtherDiff: " + (loopTotal - sumOfCompsTotal) + "ms");
+    }
+
+    private static void busySqrt(double[]results, int threadIdx) {
+        double x = Math.random()*1e10;
+        for (int i = 0; i < 1000000000; ++i){
+            x = Math.sqrt(x*Math.random()*1.e10);
+        }
+        results[threadIdx] = x;
     }
 }
