@@ -26,10 +26,8 @@ public class BCReplicaSimple {
         int threadCount = Integer.parseInt(args[0]);
         int iterations = Integer.parseInt(args[1]);
 
-        final int globalColCount = 50000;
-        final int totalComputingUnits = 24 * 20;
-
-        int rowCountPerUnit = globalColCount/ totalComputingUnits;
+        final int globalColCount = args.length > 2 ? Integer.parseInt(args[2]): 50000;
+        final int rowCountPerUnit = args.length > 3 ? Integer.parseInt(args[3]): 100;
 
         preX = new double[globalColCount][targetDimension];
         threadPartialOutMM = new double[threadCount][rowCountPerUnit][targetDimension];
