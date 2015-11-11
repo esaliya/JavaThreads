@@ -106,7 +106,7 @@ public class BCReplicaSimple {
 
     private static void busySqrt(double[]results, int threadIdx) {
         double x = Math.random()*1e10;
-        for (int i = 0; i < 1000000000; ++i){
+        for (int i = 0; i < 15000000; ++i){
             x = Math.sqrt(x*Math.random()*1.e10);
         }
         results[threadIdx] = x;
