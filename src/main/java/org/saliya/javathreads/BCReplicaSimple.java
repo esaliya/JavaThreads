@@ -59,15 +59,14 @@ public class BCReplicaSimple {
             IntStream.range(0,threadCount).forEach(t -> timers[t] = Stopwatch.createUnstarted());
             dataInitTimer.stop();
 
-            hjAppTimer.start();
-            launchHabaneroApp(
-                () -> forallChunked(
-                    0, threadCount - 1, (threadIdx) -> {
+            if (threadCount > 1) {
+                hjAppTimer.start();
+                launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
                         timers[threadIdx].start();
-                        MatrixUtils.matrixMultiply(
-                            threadPartialBofZ[threadIdx], preX, rowCountPerUnit,
-                            targetDimension, globalColCount, blockSize,
-                            threadPartialOutMM[threadIdx]);
+                        MatrixUtils
+                            .matrixMultiply(threadPartialBofZ[threadIdx], preX,
+                                rowCountPerUnit, targetDimension, globalColCount, blockSize,
+                                threadPartialOutMM[threadIdx]);
 
                         // Note - now what if we replace matrix multiply with busysqrt
                         /*busySqrt(busySqrtResults, threadIdx);*/
@@ -76,19 +75,30 @@ public class BCReplicaSimple {
                         /*naiveMM(threadPartialBofZ[threadIdx], preX, threadPartialOutMM[threadIdx], rowCountPerUnit, globalColCount, targetDimension);*/
                         timers[threadIdx].stop();
                     }));
-            hjAppTimer.stop();
+                hjAppTimer.stop();
+            } else{
+                timers[0].start();
+                MatrixUtils
+                    .matrixMultiply(threadPartialBofZ[0], preX,
+                        rowCountPerUnit, targetDimension, globalColCount, blockSize,
+                        threadPartialOutMM[0]);
+                timers[0].stop();
+            }
+
 
             miscTimer.start();
             DoubleSummaryStatistics ds = Arrays.stream(timers).collect(Collectors.summarizingDouble(timer->timer.elapsed(TimeUnit.MILLISECONDS)));
             System.out.println(
                 "Iteration: " + itr + " dataInitTime: " + dataInitTimer
-                    .elapsed(TimeUnit.MILLISECONDS) + " ms hjAppTime: "
-                + hjAppTimer.elapsed(TimeUnit.MILLISECONDS) + " ms " + " ThreadMin: " + ds.getMin() + " ms ThreadMax: " + ds.getMax() + " ms ThreadAvg: " + ds.getAverage() + " ms");
+                    .elapsed(TimeUnit.MILLISECONDS) + " ms" + ((threadCount>1)?(" hjAppTime: "
+                + hjAppTimer.elapsed(TimeUnit.MILLISECONDS) + " ms "):"") + " ThreadMin: " + ds.getMin() + " ms ThreadMax: " + ds.getMax() + " ms ThreadAvg: " + ds.getAverage() + " ms");
             miscTimer.stop();
 
             dataInitTime += dataInitTimer
                 .elapsed(TimeUnit.MILLISECONDS);
-            hjAppTime += hjAppTimer.elapsed(TimeUnit.MILLISECONDS);
+            if (threadCount > 1) {
+                hjAppTime += hjAppTimer.elapsed(TimeUnit.MILLISECONDS);
+            }
             miscTime += miscTimer.elapsed(TimeUnit.MILLISECONDS);
 
 
@@ -102,7 +112,7 @@ public class BCReplicaSimple {
             TimeUnit.MILLISECONDS);
         System.out.println(
             "Loop Total: " + loopTotal + " ms dataInitTotal: " + dataInitTime
-            + " ms hjAppTimeTotal: " + hjAppTime + " ms miscTimeTotal: "
+            + " ms" + (threadCount > 1 ? (" hjAppTimeTotal: " + hjAppTime + " ms"): "") + " miscTimeTotal: "
             + miscTime + " ms SumOfCompsTotal: " + sumOfCompsTotal
             + " ms AnyOtherDiff: " + (loopTotal - sumOfCompsTotal) + "ms");
     }
