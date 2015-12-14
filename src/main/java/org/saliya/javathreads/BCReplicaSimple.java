@@ -44,6 +44,7 @@ public class BCReplicaSimple {
         long miscTime = 0L;
         long hjAppTime = 0L;
         long dataInitTime = 0L;
+        double computeTotalTime = 0.0;
         Stopwatch loopTimer = Stopwatch.createStarted();
         for (int itr = 0; itr < iterations; ++itr) {
             dataInitTimer.start();
@@ -88,6 +89,7 @@ public class BCReplicaSimple {
 
             miscTimer.start();
             DoubleSummaryStatistics ds = Arrays.stream(timers).collect(Collectors.summarizingDouble(timer->timer.elapsed(TimeUnit.MILLISECONDS)));
+            computeTotalTime += ds.getMax();
             System.out.println(
                 "Iteration: " + itr + " dataInitTime: " + dataInitTimer
                     .elapsed(TimeUnit.MILLISECONDS) + " ms" + ((threadCount>1)?(" hjAppTime: "
@@ -111,7 +113,7 @@ public class BCReplicaSimple {
         final long loopTotal = loopTimer.elapsed(
             TimeUnit.MILLISECONDS);
         System.out.println(
-            "Loop Total: " + loopTotal + " ms dataInitTotal: " + dataInitTime
+            "Compute Avg: " + (computeTotalTime / iterations) + " ms Loop Total: " + loopTotal + " ms dataInitTotal: " + dataInitTime
             + " ms" + (threadCount > 1 ? (" hjAppTimeTotal: " + hjAppTime + " ms"): "") + " miscTimeTotal: "
             + miscTime + " ms SumOfCompsTotal: " + sumOfCompsTotal
             + " ms AnyOtherDiff: " + (loopTotal - sumOfCompsTotal) + "ms");
