@@ -64,16 +64,16 @@ public class BCReplicaSimple {
                 () -> forallChunked(
                     0, threadCount - 1, (threadIdx) -> {
                         timers[threadIdx].start();
-                        /*MatrixUtils.matrixMultiply(
+                        MatrixUtils.matrixMultiply(
                             threadPartialBofZ[threadIdx], preX, rowCountPerUnit,
                             targetDimension, globalColCount, blockSize,
-                            threadPartialOutMM[threadIdx]);*/
+                            threadPartialOutMM[threadIdx]);
 
                         // Note - now what if we replace matrix multiply with busysqrt
                         /*busySqrt(busySqrtResults, threadIdx);*/
 
                         // Note - now see with naive MM
-                        naiveMM(threadPartialBofZ[threadIdx], preX, threadPartialOutMM[threadIdx], rowCountPerUnit, globalColCount, targetDimension);
+                        /*naiveMM(threadPartialBofZ[threadIdx], preX, threadPartialOutMM[threadIdx], rowCountPerUnit, globalColCount, targetDimension);*/
                         timers[threadIdx].stop();
                     }));
             hjAppTimer.stop();
