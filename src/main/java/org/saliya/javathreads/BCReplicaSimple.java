@@ -31,27 +31,10 @@ public class BCReplicaSimple {
         final int globalColCount = args.length > 2 ? Integer.parseInt(args[2]): 50000;
         final int rowCountPerUnit = args.length > 3 ? Integer.parseInt(args[3]): 100;
 
-//        preX = new double[globalColCount][targetDimension];
-        preX = new double[globalColCount][];
-        for (int i = 0; i < globalColCount; ++i){
-            preX[i] = new double[targetDimension];
-        }
+        preX = new double[globalColCount][targetDimension];
 
-//        threadPartialOutMM = new double[threadCount][rowCountPerUnit][targetDimension];
-        threadPartialOutMM = new double[threadCount][][];
-//        threadPartialBofZ = new double[threadCount][rowCountPerUnit][globalColCount];
-        threadPartialBofZ = new double[threadCount][][];
-        for (int i = 0; i < threadCount; ++i){
-            threadPartialOutMM[i] = new double[rowCountPerUnit][];
-            threadPartialBofZ[i] = new double[rowCountPerUnit][];
-            for (int j = 0; j < rowCountPerUnit; ++j){
-                threadPartialBofZ[i][j] = new double[globalColCount];
-            }
-
-            for (int k = 0; k < targetDimension; ++k){
-                threadPartialOutMM[i][k] = new double[targetDimension];
-            }
-        }
+        threadPartialOutMM = new double[threadCount][rowCountPerUnit][targetDimension];
+        threadPartialBofZ = new double[threadCount][rowCountPerUnit][globalColCount];
 
         timers = new Stopwatch[threadCount];
 
