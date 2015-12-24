@@ -21,7 +21,7 @@ public class BCReplicaSimpleCacheOptimized {
 
     static double[] busySqrtResults;
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         int threadCount = Integer.parseInt(args[0]);
         int iterations = Integer.parseInt(args[1]);
 
@@ -67,10 +67,10 @@ public class BCReplicaSimpleCacheOptimized {
                                 threadPartialOutMM[threadIdx]);
 
                         // Note - now what if we replace matrix multiply with busysqrt
-                        /*busySqrt(busySqrtResults, threadIdx);*/
+                        *//*busySqrt(busySqrtResults, threadIdx);*//*
 
                         // Note - now see with naive MM
-                        /*naiveMM(threadPartialBofZ[threadIdx], preX, threadPartialOutMM[threadIdx], rowCountPerUnit, globalColCount, targetDimension);*/
+                        *//*naiveMM(threadPartialBofZ[threadIdx], preX, threadPartialOutMM[threadIdx], rowCountPerUnit, globalColCount, targetDimension);*//*
                         timers[threadIdx].stop();
                     }));
                 hjAppTimer.stop();
@@ -114,7 +114,7 @@ public class BCReplicaSimpleCacheOptimized {
             + " ms" + (threadCount > 1 ? (" hjAppTimeTotal: " + hjAppTime + " ms"): "") + " miscTimeTotal: "
             + miscTime + " ms SumOfCompsTotal: " + sumOfCompsTotal
             + " ms AnyOtherDiff: " + (loopTotal - sumOfCompsTotal) + "ms");
-    }
+    }*/
 
     private static void busySqrt(double[]results, int threadIdx) {
         double x = Math.random()*1e10;
