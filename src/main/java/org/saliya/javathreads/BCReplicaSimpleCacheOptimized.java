@@ -1,11 +1,8 @@
 package org.saliya.javathreads;
 
 import com.google.common.base.Stopwatch;
-import net.openhft.affinity.Affinity;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.DoubleSummaryStatistics;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -14,10 +11,10 @@ import java.util.stream.IntStream;
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
 
-public class BCReplicaSimple {
-    static double [][][] threadPartialBofZ;
-    static double [][] preX;
-    static double [][][] threadPartialOutMM;
+public class BCReplicaSimpleCacheOptimized {
+    static double [][] threadPartialBofZ;
+    static double [] preX;
+    static double [][] threadPartialOutMM;
     static int targetDimension = 3;
     static int blockSize = 64;
     static Stopwatch[] timers;
@@ -31,28 +28,9 @@ public class BCReplicaSimple {
         final int globalColCount = args.length > 2 ? Integer.parseInt(args[2]): 50000;
         final int rowCountPerUnit = args.length > 3 ? Integer.parseInt(args[3]): 100;
 
-//        preX = new double[globalColCount][targetDimension];
-        preX = new double[globalColCount][];
-        for (int i = 0; i < globalColCount; ++i){
-            preX[i] = new double[targetDimension];
-        }
-
-//        threadPartialOutMM = new double[threadCount][rowCountPerUnit][targetDimension];
-        threadPartialOutMM = new double[threadCount][][];
-//        threadPartialBofZ = new double[threadCount][rowCountPerUnit][globalColCount];
-        threadPartialBofZ = new double[threadCount][][];
-        for (int i = 0; i < threadCount; ++i){
-            threadPartialOutMM[i] = new double[rowCountPerUnit][];
-            threadPartialBofZ[i] = new double[rowCountPerUnit][];
-            for (int j = 0; j < rowCountPerUnit; ++j){
-                threadPartialBofZ[i][j] = new double[globalColCount];
-            }
-
-            for (int k = 0; k < targetDimension; ++k){
-                threadPartialOutMM[i][k] = new double[targetDimension];
-            }
-        }
-
+        preX = new double[globalColCount*targetDimension];
+        threadPartialOutMM = new double[threadCount][rowCountPerUnit*targetDimension];
+        threadPartialBofZ = new double[threadCount][rowCountPerUnit*globalColCount];
         timers = new Stopwatch[threadCount];
 
         busySqrtResults = new double[threadCount];
@@ -68,13 +46,13 @@ public class BCReplicaSimple {
         for (int itr = 0; itr < iterations; ++itr) {
             dataInitTimer.start();
             IntStream.range(0, globalColCount).forEach(r -> IntStream.range(0, targetDimension).forEach(c -> {
-                        preX[r][c] = Math.random();
+                        preX[r*targetDimension+c] = Math.random();
                     }));
             IntStream.range(0,threadCount).forEach(t -> IntStream.range(0, rowCountPerUnit).forEach(r -> IntStream.range(0, globalColCount).forEach(c -> {
-                            threadPartialBofZ[t][r][c] = Math.random();
+                            threadPartialBofZ[t][r*globalColCount+c] = Math.random();
                         })));
             IntStream.range(0,threadCount).forEach(t -> IntStream.range(0, rowCountPerUnit).forEach(r -> IntStream.range(0, targetDimension).forEach(c -> {
-                            threadPartialOutMM[t][r][c] = 0.0;
+                            threadPartialOutMM[t][r*targetDimension+c] = 0.0;
                         })));
             IntStream.range(0,threadCount).forEach(t -> timers[t] = Stopwatch.createUnstarted());
             dataInitTimer.stop();
