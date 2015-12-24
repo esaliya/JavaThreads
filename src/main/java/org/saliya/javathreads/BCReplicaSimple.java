@@ -2,6 +2,7 @@ package org.saliya.javathreads;
 
 import com.google.common.base.Stopwatch;
 import net.openhft.affinity.Affinity;
+import net.openhft.ticker.impl.SystemClock;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -81,21 +82,25 @@ public class BCReplicaSimple {
                 hjAppTimer.stop();
             } else{
                 timers[0].start();
+                long t = System.currentTimeMillis();
                 MatrixUtils
                     .matrixMultiply(threadPartialBofZ[0], preX,
                         rowCountPerUnit, targetDimension, globalColCount, blockSize,
                         threadPartialOutMM[0]);
                 timers[0].stop();
+                System.out.println((System.currentTimeMillis() - t) + "ms");
             }
 
 
             miscTimer.start();
             DoubleSummaryStatistics ds = Arrays.stream(timers).collect(Collectors.summarizingDouble(timer->timer.elapsed(TimeUnit.MILLISECONDS)));
             computeTotalTime += ds.getMax();
+/*
             System.out.println(
                 "Iteration: " + itr + " dataInitTime: " + dataInitTimer
                     .elapsed(TimeUnit.MILLISECONDS) + " ms" + ((threadCount>1)?(" hjAppTime: "
                 + hjAppTimer.elapsed(TimeUnit.MILLISECONDS) + " ms "):"") + " ThreadMin: " + ds.getMin() + " ms ThreadMax: " + ds.getMax() + " ms ThreadAvg: " + ds.getAverage() + " ms");
+*/
             miscTimer.stop();
 
             dataInitTime += dataInitTimer
