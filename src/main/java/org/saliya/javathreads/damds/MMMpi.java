@@ -117,8 +117,8 @@ public class MMMpi {
 
                 Utils.printMessage("Iteration " + itr + " time " + time +" ms compute " + compTime + " ms comm " + commTime + " ms");
             }
-            Utils.printMessage("Total " + itr + " time " + accumTime +" ms compute " + accumCompTime + " ms comm " + accumCommTime + " ms");
         }
+        Utils.printMessage("Total time " + accumTime +" ms compute " + accumCompTime + " ms comm " + accumCommTime + " ms");
 
 
 
