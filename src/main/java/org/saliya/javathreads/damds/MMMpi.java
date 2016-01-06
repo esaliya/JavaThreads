@@ -1,6 +1,7 @@
 package org.saliya.javathreads.damds;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Interner;
 import mpi.MPIException;
 import net.openhft.lang.io.Bytes;
 import org.saliya.javathreads.*;
@@ -29,7 +30,10 @@ public class MMMpi {
         /* Set configuration options */
         final int iterations = Integer.parseInt(args[0]);
         final int globalColCount = Integer.parseInt(args[1]);
+        ParallelOps.nodeCount = Integer.parseInt(args[2]);
+        ParallelOps.mmapScratchDir = (args.length > 3) ? args[3] : "/dev/shm";
         ParallelOps.threadCount = 1;
+        ParallelOps.mmapsPerNode = 1;
 
         /* Set up parallelism */
         ParallelOps.setupParallelism(args);
