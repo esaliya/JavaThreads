@@ -24,8 +24,8 @@ public class ProgramGlobalArray {
 
         double [] A = new double[threadCount*rows*cols];
         double [] B = new double[cols*dim];
-        double [] C = new double[threadCount*rows*dim];
-        double [] Adiag = new double[rows];
+        double [][] C = new double[threadCount][rows*dim];
+        double [][] Adiag = new double[threadCount][rows];
         for (int i = 0; i < threadCount*rows*cols; ++i){
             A[i] = Math.random();
         }
@@ -33,23 +33,27 @@ public class ProgramGlobalArray {
         for (int i = 0; i < cols*dim; ++i){
             B[i] = Math.random();
         }
-        for (int i = 0; i < threadCount*rows*dim; ++i){
-            C[i] = 0.0;
+        for (int i = 0; i < threadCount; ++i) {
+            for (int j = 0; j < rows * dim; ++j) {
+                C[i][j] = 0.0;
+            }
         }
 
-        for (int i = 0; i < rows; ++i){
-            Adiag[i] = Math.random();
+        for (int i = 0; i < threadCount; ++i) {
+            for (int j = 0; j < rows; ++j) {
+                Adiag[i][j] = Math.random();
+            }
         }
 
 
         if (threadCount > 1){
             final CountDownLatch latch = new CountDownLatch(threadCount);
             launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
-                mmManager(iterations, threadIdx, rank, rows, cols, dim, A, Adiag, B, C, latch);
+                mmManager(iterations, threadIdx, rank, rows, cols, dim, A, Adiag[threadIdx], B, C[threadIdx], latch);
             }));
         } else {
             final CountDownLatch latch = new CountDownLatch(1);
-            mmManager(iterations, 0, rank, rows, cols, dim, A, Adiag, B, C,
+            mmManager(iterations, 0, rank, rows, cols, dim, A, Adiag[0], B, C[0],
                 latch);
         }
 
