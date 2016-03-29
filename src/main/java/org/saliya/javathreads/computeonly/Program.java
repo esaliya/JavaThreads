@@ -48,7 +48,7 @@ public class Program {
             if (maxCalcTime < t) maxCalcTime = t;
             if (minCalcTime > t) minCalcTime = t;
         }
-        System.out.println("Rank: " + rank  + "Thread: " + threadIdx + " avg: " + (avgCalcTime / iterations) + " min: " + minCalcTime + " max: " + maxCalcTime);
+        System.out.println("Rank: " + rank  + " Thread: " + threadIdx + " avg: " + (avgCalcTime / iterations) + " min: " + minCalcTime + " max: " + maxCalcTime);
     }
 
 
