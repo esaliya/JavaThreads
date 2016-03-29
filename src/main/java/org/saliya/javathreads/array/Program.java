@@ -42,18 +42,18 @@ public class Program {
         double [] C = new double[rows*dim];
         double [] Adiag = new double[rows];
         for (int i = 0; i < rows*cols; ++i){
-            A[i] = Math.random();
+            A[i] = (i & 1) == 0 ? (0.9999995 / 1.0000023) : (1.0000023 / 0.9999995);
         }
 
         for (int i = 0; i < cols*dim; ++i){
-            B[i] = Math.random();
+            B[i] = (i & 1) == 0 ? (0.9999995 / 1.0000023) : (1.0000023 / 0.9999995);
         }
         for (int i = 0; i < rows*dim; ++i){
             C[i] = 0.0;
         }
 
         for (int i = 0; i < rows; ++i){
-            Adiag[i] = Math.random();
+            Adiag[i] = (i & 1) == 0 ? (0.9999995 / 1.0000023) : (1.0000023 / 0.9999995);
         }
 
         latch.countDown();
