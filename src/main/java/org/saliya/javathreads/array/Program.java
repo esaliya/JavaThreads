@@ -21,6 +21,9 @@ public class Program {
         int dim = Integer.parseInt(args[4]);
 
         int rank = MPI.COMM_WORLD.getRank();
+        Stopwatch mainTimer = Stopwatch.createUnstarted();
+        MPI.COMM_WORLD.barrier();
+        mainTimer.start();
         if (threadCount > 1){
             final CountDownLatch latch = new CountDownLatch(threadCount);
             launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
@@ -29,6 +32,11 @@ public class Program {
         } else {
             final CountDownLatch latch = new CountDownLatch(1);
             mmManager(iterations, 0, rank, rows, cols, dim, latch);
+        }
+        MPI.COMM_WORLD.barrier();
+        mainTimer.stop();
+        if (rank == 0){
+            System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS));
         }
 
         MPI.Finalize();
