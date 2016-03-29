@@ -20,18 +20,19 @@ public class Program {
         int threadCount = Integer.parseInt(args[0]);
         int iterations = Integer.parseInt(args[1]);
 
+        int rank = MPI.COMM_WORLD.getRank();
         if (threadCount > 1){
             launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
-                calcManager(iterations, threadIdx);
+                calcManager(iterations, threadIdx, rank);
             }));
         } else {
-           calcManager(iterations, 0);
+           calcManager(iterations, 0, rank);
         }
 
         MPI.Finalize();
     }
 
-    private static void calcManager(int iterations, Integer threadIdx) {
+    private static void calcManager(int iterations, Integer threadIdx, int rank) {
         Stopwatch calcTimer = Stopwatch.createUnstarted();
         double avgCalcTime = 0.0;
         double maxCalcTime = Double.MIN_VALUE;
@@ -47,7 +48,7 @@ public class Program {
             if (maxCalcTime < t) maxCalcTime = t;
             if (minCalcTime > t) minCalcTime = t;
         }
-        System.out.println("Thread: " + threadIdx + " avg: " + (avgCalcTime / iterations) + " min: " + minCalcTime + " max: " + maxCalcTime);
+        System.out.println("Rank: " + rank  + "Thread: " + threadIdx + " avg: " + (avgCalcTime / iterations) + " min: " + minCalcTime + " max: " + maxCalcTime);
     }
 
 
