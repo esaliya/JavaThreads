@@ -3,13 +3,8 @@ package org.saliya.javathreads.computeonly;
 import com.google.common.base.Stopwatch;
 import mpi.MPI;
 import mpi.MPIException;
-import org.saliya.javathreads.MatrixUtils;
 
-import java.util.Arrays;
-import java.util.DoubleSummaryStatistics;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
