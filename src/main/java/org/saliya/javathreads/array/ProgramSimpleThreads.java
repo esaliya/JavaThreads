@@ -57,7 +57,12 @@ public class ProgramSimpleThreads {
             }
 
             startLatch.countDown();
-
+            try {
+                startLatch.await();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             Stopwatch mmTimer = Stopwatch.createUnstarted();
             double avgMMTime = 0.0;
             double maxMMTime = Double.MIN_VALUE;
@@ -80,7 +85,8 @@ public class ProgramSimpleThreads {
 
         }
     }
-    public static void main(String[] args) throws MPIException {
+    public static void main(String[] args)
+        throws MPIException, InterruptedException {
         MPI.Init(args);
         int threadCount = Integer.parseInt(args[0]);
         int iterations = Integer.parseInt(args[1]);
@@ -102,7 +108,7 @@ public class ProgramSimpleThreads {
             for (int i = 0; i < threadCount; ++i){
                 new Thread(new Worker(iterations, i, rank, rows, cols, dim, startLatch, endLatch)).start();
             }
-            endLatch.countDown();
+            endLatch.await();
             mainTimer.stop();
 
         } else {
