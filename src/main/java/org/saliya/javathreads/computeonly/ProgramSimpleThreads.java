@@ -1,4 +1,4 @@
-package org.saliya.javathreads.array;
+package org.saliya.javathreads.computeonly;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.primitives.Booleans;
