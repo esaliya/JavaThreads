@@ -102,15 +102,18 @@ public class ProgramSimpleThreads {
             for (int i = 0; i < threadCount; ++i){
                 new Thread(new Worker(iterations, i, rank, rows, cols, dim, startLatch, endLatch)).start();
             }
+            endLatch.countDown();
+            mainTimer.stop();
 
         } else {
             MPI.COMM_WORLD.barrier();
             mainTimer.start();
             mmManager(iterations, 0, rank, rows, cols, dim);
             MPI.COMM_WORLD.barrier();
+            mainTimer.stop();
         }
 
-        mainTimer.stop();
+
         if (rank == 0){
             System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS));
         }
