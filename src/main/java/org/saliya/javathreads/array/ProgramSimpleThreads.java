@@ -1,6 +1,7 @@
 package org.saliya.javathreads.array;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.primitives.Booleans;
 import mpi.MPI;
 import mpi.MPIException;
 import org.saliya.javathreads.MatrixUtils;
@@ -93,6 +94,7 @@ public class ProgramSimpleThreads {
         int rows = Integer.parseInt(args[2]);
         int cols = Integer.parseInt(args[3]);
         int dim = Integer.parseInt(args[4]);
+        boolean hj = Boolean.parseBoolean(args[5]);
 
         int rank = MPI.COMM_WORLD.getRank();
 
@@ -105,8 +107,16 @@ public class ProgramSimpleThreads {
             final CountDownLatch endLatch = new CountDownLatch(threadCount);
 
             mainTimer.start();
-            for (int i = 0; i < threadCount; ++i){
-                new Thread(new Worker(iterations, i, rank, rows, cols, dim, startLatch, endLatch)).start();
+            if (!hj) {
+                for (int i = 0; i < threadCount; ++i) {
+                    new Thread(new Worker(iterations, i, rank, rows, cols, dim,
+                        startLatch, endLatch)).start();
+                }
+            } else {
+                launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
+                    new Worker(iterations, threadIdx, rank, rows, cols, dim,
+                        startLatch, endLatch).run();
+                }));
             }
             endLatch.await();
             mainTimer.stop();
