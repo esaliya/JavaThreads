@@ -106,13 +106,16 @@ public class ProgramSimpleThreads {
             final CountDownLatch startLatch = new CountDownLatch(threadCount);
             final CountDownLatch endLatch = new CountDownLatch(threadCount);
 
-            mainTimer.start();
             if (!hj) {
+                System.out.println("Java Threads");
+                mainTimer.start();
                 for (int i = 0; i < threadCount; ++i) {
                     new Thread(new Worker(iterations, i, rank, rows, cols, dim,
                         startLatch, endLatch)).start();
                 }
             } else {
+                System.out.println("HJ Threads");
+                mainTimer.start();
                 launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
                     new Worker(iterations, threadIdx, rank, rows, cols, dim,
                         startLatch, endLatch).run();
