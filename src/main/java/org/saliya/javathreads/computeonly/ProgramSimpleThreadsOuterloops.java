@@ -110,7 +110,6 @@ public class ProgramSimpleThreadsOuterloops {
                 Executor executor = Executors.newFixedThreadPool(threadCount);
                 mainTimer.start();
                 for (int loops = 0; loops < outerloops; ++loops) {
-                    System.out.println("outer loop " + loops);
                     final CountDownLatch startLatch = new CountDownLatch(threadCount);
                     final CountDownLatch endLatch = new CountDownLatch(threadCount);
                     for (int i = 0; i < threadCount; ++i) {
@@ -124,7 +123,6 @@ public class ProgramSimpleThreadsOuterloops {
                 System.out.println("HJ Threads");
                 mainTimer.start();
                 for (int loops = 0; loops < outerloops; ++loops) {
-                    System.out.println("outer loop " + loops);
                     final CountDownLatch startLatch = new CountDownLatch(threadCount);
                     final CountDownLatch endLatch = new CountDownLatch(threadCount);
                     launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
