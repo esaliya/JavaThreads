@@ -83,7 +83,7 @@ public class ProgramSimpleThreadsOuterloops {
             if (minMMTime > t) minMMTime = t;
 
             endLatch.countDown();
-            System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
+//            System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
 
         }
     }
@@ -192,6 +192,6 @@ public class ProgramSimpleThreadsOuterloops {
         avgMMTime += t;
         if (maxMMTime < t) maxMMTime = t;
         if (minMMTime > t) minMMTime = t;
-        System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
+//        System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
     }
 }
