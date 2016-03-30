@@ -41,7 +41,7 @@ public class ProgramSimpleThreadsOuterloops {
         public void run() {
             BitSet bitSet = new BitSet(48);
             bitSet.set(threadIdx+1);
-            bitSet.set(threadIdx+1+24);
+//            bitSet.set(threadIdx+1+24);
             Affinity.setAffinity(bitSet);
 
             double [] A = new double[rows*cols];
