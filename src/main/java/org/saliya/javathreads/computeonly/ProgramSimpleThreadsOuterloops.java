@@ -5,10 +5,7 @@ import mpi.MPI;
 import mpi.MPIException;
 import org.saliya.javathreads.MatrixUtils;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
@@ -103,11 +100,10 @@ public class ProgramSimpleThreadsOuterloops {
         Stopwatch mainTimer = Stopwatch.createUnstarted();
 
 
-
         if (threadCount > 1){
             if (!hj) {
                 System.out.println("Java Threads");
-                Executor executor = Executors.newFixedThreadPool(threadCount);
+                ExecutorService executor = Executors.newFixedThreadPool(threadCount);
                 mainTimer.start();
                 for (int loops = 0; loops < outerloops; ++loops) {
                     final CountDownLatch startLatch = new CountDownLatch(threadCount);
@@ -119,6 +115,9 @@ public class ProgramSimpleThreadsOuterloops {
                     }
                     endLatch.await();
                 }
+                mainTimer.stop();
+                executor.shutdown();
+
             } else {
                 System.out.println("HJ Threads");
                 mainTimer.start();
@@ -131,8 +130,9 @@ public class ProgramSimpleThreadsOuterloops {
                     }));
                     endLatch.await();
                 }
+                mainTimer.stop();
             }
-            mainTimer.stop();
+
 
         } else {
 
@@ -149,6 +149,7 @@ public class ProgramSimpleThreadsOuterloops {
         if (rank == 0){
             System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS));
         }
+
 
         MPI.Finalize();
     }
