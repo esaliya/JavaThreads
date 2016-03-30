@@ -3,8 +3,12 @@ package org.saliya.javathreads.computeonly;
 import com.google.common.base.Stopwatch;
 import mpi.MPI;
 import mpi.MPIException;
+import net.openhft.affinity.Affinity;
+import net.openhft.affinity.AffinitySupport;
+import org.saliya.javathreads.AffinityThreads;
 import org.saliya.javathreads.MatrixUtils;
 
+import java.util.BitSet;
 import java.util.concurrent.*;
 
 import static edu.rice.hj.Module0.launchHabaneroApp;
@@ -35,6 +39,10 @@ public class ProgramSimpleThreadsOuterloops {
         }
         @Override
         public void run() {
+            BitSet bitSet = new BitSet(48);
+            bitSet.set(threadIdx+1);
+            bitSet.set(threadIdx+1+24);
+            Affinity.setAffinity(bitSet);
 
             double [] A = new double[rows*cols];
             double [] B = new double[cols*dim];
