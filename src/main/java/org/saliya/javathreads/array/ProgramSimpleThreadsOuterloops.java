@@ -4,10 +4,9 @@ import com.google.common.base.Stopwatch;
 import mpi.MPI;
 import mpi.MPIException;
 import net.openhft.affinity.Affinity;
-import net.openhft.affinity.AffinitySupport;
-import org.saliya.javathreads.AffinityThreads;
 import org.saliya.javathreads.MatrixUtils;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.*;
 
@@ -16,6 +15,7 @@ import static edu.rice.hj.Module1.forallChunked;
 
 public class ProgramSimpleThreadsOuterloops {
     static class Worker implements Runnable{
+        private final double[] times;
         int iterations;
         int threadIdx;
         int rank;
@@ -25,7 +25,10 @@ public class ProgramSimpleThreadsOuterloops {
         CountDownLatch startLatch;
         CountDownLatch endLatch;
 
-        Worker (int iterations, int threadIdx, int rank, int rows, int cols, int dim, CountDownLatch startLatch, CountDownLatch endLatch){
+        Worker(
+            int iterations, int threadIdx, int rank, int rows, int cols, int
+            dim, CountDownLatch startLatch, CountDownLatch endLatch,
+            double[] times){
             this.iterations = iterations;
             this.threadIdx = threadIdx;
             this.rank = rank;
@@ -35,6 +38,7 @@ public class ProgramSimpleThreadsOuterloops {
 
             this.startLatch = startLatch;
             this.endLatch = endLatch;
+            this.times = times;
 
         }
         @Override
@@ -86,7 +90,7 @@ public class ProgramSimpleThreadsOuterloops {
             avgMMTime += t;
             if (maxMMTime < t) maxMMTime = t;
             if (minMMTime > t) minMMTime = t;
-
+            times[threadIdx]+= t;
             endLatch.countDown();
 //            System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
 
@@ -105,6 +109,10 @@ public class ProgramSimpleThreadsOuterloops {
 
         int rank = MPI.COMM_WORLD.getRank();
 
+        double[] times = new double[threadCount];
+        for (int i = 0; i < threadCount; ++i){
+            times[i] = 0.0;
+        }
         Stopwatch mainTimer = Stopwatch.createUnstarted();
 
 
@@ -119,7 +127,7 @@ public class ProgramSimpleThreadsOuterloops {
                     for (int i = 0; i < threadCount; ++i) {
                         executor.execute(
                             new Worker(iterations, i, rank, rows, cols, dim,
-                                startLatch, endLatch));
+                                startLatch, endLatch, times));
                     }
                     endLatch.await();
                 }
@@ -134,7 +142,7 @@ public class ProgramSimpleThreadsOuterloops {
                     final CountDownLatch endLatch = new CountDownLatch(threadCount);
                     launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
                         new Worker(iterations, threadIdx, rank, rows, cols, dim,
-                            startLatch, endLatch).run();
+                            startLatch, endLatch, times).run();
                     }));
                     endLatch.await();
                 }
@@ -147,7 +155,7 @@ public class ProgramSimpleThreadsOuterloops {
             MPI.COMM_WORLD.barrier();
             mainTimer.start();
             for (int loops = 0; loops < outerloops; ++loops) {
-                mmManager(iterations, 0, rank, rows, cols, dim);
+                mmManager(iterations, 0, rank, rows, cols, dim, times);
                 MPI.COMM_WORLD.barrier();
             }
             mainTimer.stop();
@@ -155,7 +163,8 @@ public class ProgramSimpleThreadsOuterloops {
 
 
         if (rank == 0){
-            System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS));
+            System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS) + " " + Arrays
+                .toString(times));
         }
 
 
@@ -163,7 +172,8 @@ public class ProgramSimpleThreadsOuterloops {
     }
 
     private static void mmManager(
-        int iterations, int threadIdx, int rank, int rows, int cols, int dim) {
+        int iterations, int threadIdx, int rank, int rows, int cols, int dim,
+        double[] times) {
         double [] A = new double[rows*cols];
         double [] B = new double[cols*dim];
         double [] C = new double[rows*dim];
@@ -199,6 +209,7 @@ public class ProgramSimpleThreadsOuterloops {
         avgMMTime += t;
         if (maxMMTime < t) maxMMTime = t;
         if (minMMTime > t) minMMTime = t;
+        times[0] += t;
 //        System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
     }
 }
