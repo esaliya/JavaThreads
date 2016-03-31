@@ -152,6 +152,7 @@ public class ProgramSimpleThreadsOuterloopsQueue {
                     }
                     endLatch.await();
                 }
+                run = false;
                 mainTimer.stop();
                 executor.shutdown();
             } else {
