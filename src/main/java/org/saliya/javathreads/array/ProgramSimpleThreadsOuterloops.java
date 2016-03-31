@@ -190,7 +190,7 @@ public class ProgramSimpleThreadsOuterloops {
             if (t > max) max = t;
             avg+=t;
         }
-        return min +" " + max + " avg across " + (threads ? "threads" : "MPI") + (avg/array.length);
+        return min +" " + max + " avg across " + (threads ? "threads " : "MPI ") + (avg/array.length);
     }
 
     private static void mmManager(
