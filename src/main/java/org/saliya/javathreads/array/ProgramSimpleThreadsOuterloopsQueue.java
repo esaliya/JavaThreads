@@ -17,7 +17,8 @@ import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
 
 public class ProgramSimpleThreadsOuterloopsQueue {
-    static boolean run;
+    static boolean run = true;
+
     static class Work {
         CountDownLatch startLatch;
         CountDownLatch endLatch;
