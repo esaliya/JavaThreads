@@ -6,10 +6,7 @@ import mpi.MPIException;
 import net.openhft.affinity.Affinity;
 import org.saliya.javathreads.MatrixUtils;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static edu.rice.hj.Module0.asyncPhased;
@@ -131,7 +128,7 @@ public class ProgramSimpleThreadsOuterloopsQueue {
                 List<Queue<Work>> queueList = new ArrayList<>(threadCount);
                 // start the threads
                 for (int i = 0; i < threadCount; ++i) {
-                    Queue<Work> workQueue = new ConcurrentLinkedQueue<>();
+                    Queue<Work> workQueue = new LinkedList<>();
                     queueList.add(i, workQueue);
                     executor.execute(
                             new Worker(iterations, i, rank, rows, cols, dim, workQueue));
