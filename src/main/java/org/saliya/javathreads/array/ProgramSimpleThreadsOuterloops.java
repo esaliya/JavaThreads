@@ -6,9 +6,11 @@ import mpi.MPIException;
 import net.openhft.affinity.Affinity;
 import org.saliya.javathreads.MatrixUtils;
 
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
@@ -109,6 +111,7 @@ public class ProgramSimpleThreadsOuterloops {
 
         int rank = MPI.COMM_WORLD.getRank();
 
+        double[] worldTimes = null;
         double[] times = new double[threadCount];
         for (int i = 0; i < threadCount; ++i){
             times[i] = 0.0;
@@ -159,16 +162,35 @@ public class ProgramSimpleThreadsOuterloops {
                 MPI.COMM_WORLD.barrier();
             }
             mainTimer.stop();
+
+            worldTimes  = new double[MPI.COMM_WORLD.getSize()];
+            MPI.COMM_WORLD.gather(times, 1, MPI.DOUBLE, worldTimes, 1, MPI.DOUBLE, 0);
         }
 
 
         if (rank == 0){
-            System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS) + " " + Arrays
-                .toString(times));
+            System.out.println(
+                "Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS) + " "
+                + findMinMaxAvg(
+                    (threadCount > 1 ? times : worldTimes), (threadCount > 1)));
         }
 
 
         MPI.Finalize();
+    }
+
+    private static String findMinMaxAvg(double[] array, boolean threads){
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        double avg = 0.0;
+        double t;
+        for (int i = 0; i < array.length; ++i){
+            t = array[i];
+            if (t < min) min = t;
+            if (t > max) max = t;
+            avg+=t;
+        }
+        return min +" " + max + " avg across " + (threads ? "threads" : "MPI") + (avg/array.length);
     }
 
     private static void mmManager(
