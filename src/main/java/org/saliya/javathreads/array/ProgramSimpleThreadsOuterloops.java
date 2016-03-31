@@ -170,7 +170,7 @@ public class ProgramSimpleThreadsOuterloops {
 
         if (rank == 0){
             System.out.println(
-                "Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS) + " "
+                "" + mainTimer.elapsed(TimeUnit.MILLISECONDS) + "\t"
                 + findMinMaxAvg(
                     (threadCount > 1 ? times : worldTimes), (threadCount > 1)));
         }
@@ -190,7 +190,8 @@ public class ProgramSimpleThreadsOuterloops {
             if (t > max) max = t;
             avg+=t;
         }
-        return min +" " + max + " avg across " + (threads ? "threads " : "MPI ") + (avg/array.length);
+//        return min +" " + max + " avg across " + (threads ? "threads " : "MPI ") + (avg/array.length);
+        return min + "\t" + max + "\t" + (avg/array.length);
     }
 
     private static void mmManager(
