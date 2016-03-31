@@ -45,12 +45,11 @@ public class ProgramSimpleThreadsOuterloopsQueue {
         }
         @Override
         public void run() {
-            while (run) {
-                BitSet bitSet = new BitSet(48);
-                bitSet.set(threadIdx + 1);
+            BitSet bitSet = new BitSet(48);
+            bitSet.set(threadIdx + 1);
 //            bitSet.set(threadIdx+1+24);
-                Affinity.setAffinity(bitSet);
-
+            Affinity.setAffinity(bitSet);
+            while (run) {
                 // busy wait
                 Work w = works.poll();
                 if (w == null) {
