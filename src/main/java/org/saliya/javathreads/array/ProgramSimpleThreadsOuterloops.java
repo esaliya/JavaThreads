@@ -1,18 +1,20 @@
-package org.saliya.javathreads.computeonly;
+package org.saliya.javathreads.array;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.primitives.Booleans;
 import mpi.MPI;
 import mpi.MPIException;
+import net.openhft.affinity.Affinity;
+import net.openhft.affinity.AffinitySupport;
+import org.saliya.javathreads.AffinityThreads;
 import org.saliya.javathreads.MatrixUtils;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.BitSet;
+import java.util.concurrent.*;
 
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
 
-public class ProgramSimpleThreads {
+public class ProgramSimpleThreadsOuterloops {
     static class Worker implements Runnable{
         int iterations;
         int threadIdx;
@@ -37,6 +39,10 @@ public class ProgramSimpleThreads {
         }
         @Override
         public void run() {
+            BitSet bitSet = new BitSet(48);
+            bitSet.set(threadIdx+1);
+//            bitSet.set(threadIdx+1+24);
+            Affinity.setAffinity(bitSet);
 
             double [] A = new double[rows*cols];
             double [] B = new double[cols*dim];
@@ -82,7 +88,7 @@ public class ProgramSimpleThreads {
             if (minMMTime > t) minMMTime = t;
 
             endLatch.countDown();
-            System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
+//            System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
 
         }
     }
@@ -95,40 +101,55 @@ public class ProgramSimpleThreads {
         int cols = Integer.parseInt(args[3]);
         int dim = Integer.parseInt(args[4]);
         boolean hj = Boolean.parseBoolean(args[5]);
+        int outerloops = Integer.parseInt(args[6]);
 
         int rank = MPI.COMM_WORLD.getRank();
 
         Stopwatch mainTimer = Stopwatch.createUnstarted();
 
 
-
         if (threadCount > 1){
-            final CountDownLatch startLatch = new CountDownLatch(threadCount);
-            final CountDownLatch endLatch = new CountDownLatch(threadCount);
-
             if (!hj) {
                 System.out.println("Java Threads");
+                ExecutorService executor = Executors.newFixedThreadPool(threadCount);
                 mainTimer.start();
-                for (int i = 0; i < threadCount; ++i) {
-                    new Thread(new Worker(iterations, i, rank, rows, cols, dim,
-                        startLatch, endLatch)).start();
+                for (int loops = 0; loops < outerloops; ++loops) {
+                    final CountDownLatch startLatch = new CountDownLatch(threadCount);
+                    final CountDownLatch endLatch = new CountDownLatch(threadCount);
+                    for (int i = 0; i < threadCount; ++i) {
+                        executor.execute(
+                            new Worker(iterations, i, rank, rows, cols, dim,
+                                startLatch, endLatch));
+                    }
+                    endLatch.await();
                 }
+                mainTimer.stop();
+                executor.shutdown();
+
             } else {
                 System.out.println("HJ Threads");
                 mainTimer.start();
-                launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
-                    new Worker(iterations, threadIdx, rank, rows, cols, dim,
-                        startLatch, endLatch).run();
-                }));
+                for (int loops = 0; loops < outerloops; ++loops) {
+                    final CountDownLatch startLatch = new CountDownLatch(threadCount);
+                    final CountDownLatch endLatch = new CountDownLatch(threadCount);
+                    launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
+                        new Worker(iterations, threadIdx, rank, rows, cols, dim,
+                            startLatch, endLatch).run();
+                    }));
+                    endLatch.await();
+                }
+                mainTimer.stop();
             }
-            endLatch.await();
-            mainTimer.stop();
+
 
         } else {
+
             MPI.COMM_WORLD.barrier();
             mainTimer.start();
-            mmManager(iterations, 0, rank, rows, cols, dim);
-            MPI.COMM_WORLD.barrier();
+            for (int loops = 0; loops < outerloops; ++loops) {
+                mmManager(iterations, 0, rank, rows, cols, dim);
+                MPI.COMM_WORLD.barrier();
+            }
             mainTimer.stop();
         }
 
@@ -136,6 +157,7 @@ public class ProgramSimpleThreads {
         if (rank == 0){
             System.out.println("Main Time: " + mainTimer.elapsed(TimeUnit.MILLISECONDS));
         }
+
 
         MPI.Finalize();
     }
@@ -177,6 +199,6 @@ public class ProgramSimpleThreads {
         avgMMTime += t;
         if (maxMMTime < t) maxMMTime = t;
         if (minMMTime > t) minMMTime = t;
-        System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
+//        System.out.println(rank  + "\t" + threadIdx + "\t" + (avgMMTime) + "\t" + minMMTime + "\t" + maxMMTime);
     }
 }
