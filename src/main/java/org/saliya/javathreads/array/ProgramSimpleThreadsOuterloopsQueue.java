@@ -76,12 +76,12 @@ public class ProgramSimpleThreadsOuterloopsQueue {
                     Adiag[i] = (i & 1) == 0 ? (0.9999995 / 1.0000023) : (1.0000023 / 0.9999995);
                 }
 
-                startLatch.countDown();
-                try {
-                    startLatch.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                //startLatch.countDown();
+//                try {
+//                    startLatch.await();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 Stopwatch mmTimer = Stopwatch.createUnstarted();
                 double avgMMTime = 0.0;
                 double maxMMTime = Double.MIN_VALUE;
