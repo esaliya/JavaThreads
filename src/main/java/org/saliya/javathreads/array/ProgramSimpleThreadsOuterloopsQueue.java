@@ -124,7 +124,6 @@ public class ProgramSimpleThreadsOuterloopsQueue {
             if (!hj) {
                 System.out.println("Java Threads");
                 ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-                mainTimer.start();
                 List<Queue<Work>> queueList = new ArrayList<>(threadCount);
                 // start the threads
                 for (int i = 0; i < threadCount; ++i) {
@@ -133,7 +132,7 @@ public class ProgramSimpleThreadsOuterloopsQueue {
                     executor.execute(
                             new Worker(iterations, i, rank, rows, cols, dim, workQueue));
                 }
-
+                mainTimer.start();
                 for (int loops = 0; loops < outerloops; ++loops) {
                     final CountDownLatch startLatch = new CountDownLatch(threadCount);
                     final CountDownLatch endLatch = new CountDownLatch(threadCount);
