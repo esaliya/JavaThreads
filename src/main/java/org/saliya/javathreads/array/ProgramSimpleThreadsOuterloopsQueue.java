@@ -44,8 +44,8 @@ public class ProgramSimpleThreadsOuterloopsQueue {
         @Override
         public void run() {
             BitSet bitSet = new BitSet(48);
-            bitSet.set(threadIdx + rank * 12);
-            bitSet.set(threadIdx+24 + rank * 12);
+            bitSet.set(threadIdx + 1 + rank * 12);
+            //bitSet.set(threadIdx+24 + rank * 12);
             Affinity.setAffinity(bitSet);
             while (run) {
                 // busy wait
@@ -53,6 +53,7 @@ public class ProgramSimpleThreadsOuterloopsQueue {
                 if (w == null) {
                     continue;
                 }
+                //System.out.println("exec: " + threadIdx);
 
                 CountDownLatch startLatch = w.startLatch;
                 CountDownLatch endLatch = w.endLatch;
@@ -119,7 +120,7 @@ public class ProgramSimpleThreadsOuterloopsQueue {
 
         Stopwatch mainTimer = Stopwatch.createUnstarted();
 
-
+        System.out.println("Rank: " + rank);  
         if (threadCount > 1){
             if (!hj) {
                 System.out.println("Java Threads");
@@ -127,10 +128,11 @@ public class ProgramSimpleThreadsOuterloopsQueue {
                 List<Queue<Work>> queueList = new ArrayList<>(threadCount);
                 // start the threads
                 for (int i = 0; i < threadCount; ++i) {
-                    Queue<Work> workQueue = new LinkedList<>();
+                    //Queue<Work> workQueue = new LinkedList<>();
+                    Queue<Work> workQueue = new ConcurrentLinkedQueue<>();
                     queueList.add(i, workQueue);
                     executor.execute(
-                            new Worker(iterations, i, rank, rows, cols, dim, workQueue));
+                            new Worker(iterations, i, rank, rows, cols, dim, workQueue));                 
                 }
                 mainTimer.start();
                 for (int loops = 0; loops < outerloops; ++loops) {
