@@ -59,6 +59,7 @@ public class MMFJGlobal {
 
         /* Start main loop*/
         for (int itr = 0; itr < iterations; ++itr) {
+            timer.start();
             if (ParallelOps.threadCount > 1){
                 compTimer.start();
                 launchHabaneroApp(
@@ -75,7 +76,7 @@ public class MMFJGlobal {
             } else {
                 ParallelOps.worldProcsComm.barrier();
 
-                timer.start();
+
                 compTimer.start();
                 compInternalTimer[0].start();
                 MatrixUtils
