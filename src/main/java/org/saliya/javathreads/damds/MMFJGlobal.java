@@ -119,15 +119,18 @@ public class MMFJGlobal {
 
             compTime = compTimer.elapsed(TimeUnit.MILLISECONDS);
             sumCompTime +=compTime;
+            maxCompTime = IntStream.range(0, ParallelOps.threadCount).mapToLong(i -> compInternalTimer[i].elapsed(TimeUnit.MILLISECONDS)).max().getAsLong();
+
             commTime = commTimer.elapsed(TimeUnit.MILLISECONDS);
             sumCommTime +=commTime;
+
 
             timer.reset();
             compTimer.reset();
             IntStream.range(0, ParallelOps.threadCount).forEach(i -> compInternalTimer[i].reset());
             commTimer.reset();
 
-            Utils.printMessage("Iteration " + itr + " time " + time +" ms compute " + compTime + " ms comm " + commTime + " ms");
+            Utils.printMessage("Iteration " + itr + " time " + time +" ms compute " + compTime + " max-internal-comp " + maxCompTime + " ms comm " + commTime + " ms");
         }
         Utils.printMessage("Total time " + sumTime +" ms compute " +
                 sumCompTime + " ms comm " + sumCommTime + " ms");
