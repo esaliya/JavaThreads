@@ -17,6 +17,7 @@ public class MMFJGlobal extends MMFJ{
     public static void main(String[] args)
         throws MPIException, InterruptedException, IOException {
         setup(args);
+        MMUtils.printMessage("Running in Global Data Mode");
 
         /* Allocate global arrays */
         allocateArrays(globalColCount);
