@@ -74,9 +74,10 @@ public class MMFJGlobal {
                                 0, ParallelOps.threadCount - 1,
                                 (threadIdx) -> {
                                     compInternalTimer[threadIdx].start();
-                                    MatrixUtils
+                                    /*MatrixUtils
                                             .matrixMultiply(threadPartialBofZ[threadIdx], preX, ParallelOps.threadRowCounts[threadIdx],
-                                                    targetDimension, globalColCount, blockSize, threadPartialMM[threadIdx]);
+                                                    targetDimension, globalColCount, blockSize, threadPartialMM[threadIdx]);*/
+                                    workers[threadIdx].run();
                                     compInternalTimer[threadIdx].stop();
                                 }));
                 compTimer.stop();
