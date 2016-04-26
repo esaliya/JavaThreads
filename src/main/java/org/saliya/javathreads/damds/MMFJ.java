@@ -38,8 +38,6 @@ public abstract class MMFJ extends MM {
 
             timer.reset();
             compTimer.reset();
-
-            MMUtils.printMessage("Iteration " + itr + " time " + time +" ms compute " + compTime + " ms");
         }
         MMUtils.printMessage("Total time " + sumTime +" ms compute " +
                 sumCompTime + " ms");
