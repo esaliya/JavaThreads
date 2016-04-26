@@ -1,9 +1,11 @@
-package org.saliya.javathreads.damds;
+package org.saliya.javathreads.damds.local;
 
 import com.google.common.base.Stopwatch;
 import mpi.MPIException;
 import net.openhft.lang.io.Bytes;
-import org.saliya.javathreads.*;
+import org.saliya.javathreads.MatrixUtils;
+import org.saliya.javathreads.damds.ParallelOps;
+import org.saliya.javathreads.damds.Utils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +14,7 @@ import java.util.stream.IntStream;
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
 
-public class MMFJGlobal {
+public class MMFJLocal {
     static double [][][] threadPartialBofZ;
     static double [] preX;
     static double [][] threadPartialMM;
