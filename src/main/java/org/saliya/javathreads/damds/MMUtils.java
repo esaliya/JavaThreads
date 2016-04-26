@@ -2,7 +2,7 @@ package org.saliya.javathreads.damds;
 
 import java.util.stream.IntStream;
 
-public class Utils {
+public class MMUtils {
     public static void printAndThrowRuntimeException(RuntimeException e) {
         e.printStackTrace(System.out);
         throw e;

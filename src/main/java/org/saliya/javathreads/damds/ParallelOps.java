@@ -98,7 +98,7 @@ public class ParallelOps {
         worldProcsPerNode = worldProcsCount / nodeCount;
         boolean heterogeneous = (worldProcsPerNode * nodeCount) != worldProcsCount;
         if (heterogeneous) {
-            Utils.printMessage("Running in heterogeneous mode");
+            MMUtils.printMessage("Running in heterogeneous mode");
         }
 
         int q,r;
@@ -196,7 +196,7 @@ public class ParallelOps {
             "---------------------------------------------------------\n"
             + "Machine:" + machineName + ' ' + threadCount + 'x'
             + worldProcsPerNode + 'x' + nodeCount;
-        Utils.printMessage(parallelPattern);
+        MMUtils.printMessage(parallelPattern);
     }
 
     public static void tempBreak() throws MPIException {

@@ -160,7 +160,7 @@ public class ProgramSimpleThreadsOuterloopsQueue {
 //                    final CountDownLatch startLatch = new CountDownLatch(threadCount);
 //                    final CountDownLatch endLatch = new CountDownLatch(threadCount);
 //                    launchHabaneroApp(() -> forallChunked(0, threadCount - 1, (threadIdx) -> {
-//                        new Worker(iterations, threadIdx, rank, rows, cols, dim,
+//                        new MMWorker(iterations, threadIdx, rank, rows, cols, dim,
 //                            startLatch, endLatch).run();
 //                    }));
 //                    endLatch.await();
