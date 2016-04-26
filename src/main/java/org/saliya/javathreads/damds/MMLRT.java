@@ -75,8 +75,9 @@ public class MMLRT extends MM {
         } else {
             timer.start();
             compTimer.start();
+            MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize);
             for (int itr = 0; itr < iterations; ++itr) {
-                new MMWorker(0, globalColCount, targetDimension, blockSize).run();
+                mmWorker.run();
             }
             compTimer.stop();
             timer.stop();
