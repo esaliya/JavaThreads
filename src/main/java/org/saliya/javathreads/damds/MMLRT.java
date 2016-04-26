@@ -9,8 +9,9 @@ import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
 
 public class MMLRT extends MM {
-    public static void mmLoop(MMWorker[] workers) throws MPIException {
-        /* Start main mmLoop*/
+    public static void mmLoopGlobalData(double[][][] threadPartialBofZ, double[] preX,
+                                        double[][] threadPartialMM) throws MPIException {
+        /* Start main mmLoopLocalData*/
         if (ParallelOps.threadCount > 1){
             timer.start();
             compTimer.start();
@@ -18,8 +19,13 @@ public class MMLRT extends MM {
                     () -> forallChunked(
                             0, ParallelOps.threadCount - 1,
                             (threadIdx) -> {
+                                MMWorker mmWorker = new MMWorker
+                                        (threadIdx, threadPartialBofZ[threadIdx], preX,
+                                                threadPartialMM[threadIdx],
+                                                globalColCount, targetDimension,
+                                                blockSize);
                                 for (int itr = 0; itr < iterations; ++itr) {
-                                    workers[threadIdx].run();
+                                    mmWorker.run();
                                 }
                             }));
             compTimer.stop();
@@ -28,7 +34,49 @@ public class MMLRT extends MM {
             timer.start();
             compTimer.start();
             for (int itr = 0; itr < iterations; ++itr) {
-                workers[0].run();
+                new MMWorker
+                        (0, threadPartialBofZ[0], preX,
+                                threadPartialMM[0],
+                                globalColCount, targetDimension,
+                                blockSize).run();
+            }
+            compTimer.stop();
+            timer.stop();
+        }
+
+        time = timer.elapsed(TimeUnit.MILLISECONDS);
+        sumTime += time;
+
+        compTime = compTimer.elapsed(TimeUnit.MILLISECONDS);
+        sumCompTime +=compTime;
+
+        timer.reset();
+        compTimer.reset();
+
+        MMUtils.printMessage("Total time " + sumTime +" ms compute " +
+                sumCompTime + " ms");
+    }
+    public static void mmLoopLocalData() throws MPIException {
+        /* Start main mmLoopLocalData*/
+        if (ParallelOps.threadCount > 1){
+            timer.start();
+            compTimer.start();
+            launchHabaneroApp(
+                    () -> forallChunked(
+                            0, ParallelOps.threadCount - 1,
+                            (threadIdx) -> {
+                                MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize);
+                                for (int itr = 0; itr < iterations; ++itr) {
+                                    mmWorker.run();
+                                }
+                            }));
+            compTimer.stop();
+            timer.stop();
+        } else {
+            timer.start();
+            compTimer.start();
+            for (int itr = 0; itr < iterations; ++itr) {
+                new MMWorker(0, globalColCount, targetDimension, blockSize).run();
             }
             compTimer.stop();
             timer.stop();

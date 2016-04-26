@@ -21,7 +21,7 @@ public class MMFJLocal extends MMFJ{
                 new MMWorker(i, globalColCount, targetDimension, blockSize));
 
         ParallelOps.worldProcsComm.barrier();
-        mmLoop(workers);
+        mmLoopLocalData(workers);
         ParallelOps.tearDownParallelism();
     }
 }

@@ -13,12 +13,8 @@ public class MMFJLocalLRT extends MMLRT{
         setup(args);
         MMUtils.printMessage("Running in Local Data LRT Mode");
 
-        MMWorker[] workers = new MMWorker[ParallelOps.threadCount];
-        IntStream.range(0, ParallelOps.threadCount).forEach(i -> workers[i] =
-                new MMWorker(i, globalColCount, targetDimension, blockSize));
-
         ParallelOps.worldProcsComm.barrier();
-        mmLoop(workers);
+        mmLoopLocalData();
         ParallelOps.tearDownParallelism();
     }
 }

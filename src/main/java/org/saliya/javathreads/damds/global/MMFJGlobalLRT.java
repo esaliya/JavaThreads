@@ -18,16 +18,11 @@ public class MMFJGlobalLRT extends MMLRT{
 
         /* Allocate global arrays */
         allocateArrays(globalColCount);
-        /* To keep things simple let's take data initialization out of the mmLoop*/
+        /* To keep things simple let's take data initialization out of the mmLoopLocalData*/
         initializeData(globalColCount);
 
-        MMWorker[] workers = new MMWorker[ParallelOps.threadCount];
-        IntStream.range(0, ParallelOps.threadCount).forEach(i -> workers[i] =
-                new MMWorker(i, threadPartialBofZ[i], preX, threadPartialMM[i],
-                        globalColCount, targetDimension, blockSize));
-
         ParallelOps.worldProcsComm.barrier();
-        mmLoop(workers);
+        mmLoopGlobalData(threadPartialBofZ, preX, threadPartialMM);
         ParallelOps.tearDownParallelism();
     }
 

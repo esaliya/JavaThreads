@@ -24,13 +24,8 @@ public class MMFJGlobal extends MMFJ{
         /* To keep things simple let's take data initialization out of the mmLoop*/
         initializeData(globalColCount);
 
-        MMWorker[] workers = new MMWorker[ParallelOps.threadCount];
-        IntStream.range(0, ParallelOps.threadCount).forEach(i -> workers[i] =
-                new MMWorker(i, threadPartialBofZ[i], preX, threadPartialMM[i],
-                        globalColCount, targetDimension, blockSize));
-
         ParallelOps.worldProcsComm.barrier();
-        mmLoop(workers);
+        mmLoopGlobalData(threadPartialBofZ, preX, threadPartialMM);
         ParallelOps.tearDownParallelism();
     }
 
