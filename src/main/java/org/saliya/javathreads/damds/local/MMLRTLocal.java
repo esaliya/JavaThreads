@@ -1,11 +1,14 @@
 package org.saliya.javathreads.damds.local;
 
 import com.google.common.base.Stopwatch;
+import mpi.MPI;
 import mpi.MPIException;
 import net.openhft.affinity.Affinity;
 import org.saliya.javathreads.damds.*;
 
 import java.io.IOException;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.BitSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -20,20 +23,32 @@ public class MMLRTLocal{
     private static int globalColCount;
     private static Stopwatch timer;
 
+    private static LongBuffer times;
+    private static MMWorker[] mmWorkers;
+
     public static void main(String[] args)
             throws MPIException, InterruptedException, IOException {
         setup(args);
+        times = MPI.newLongBuffer(ParallelOps.worldProcsCount * ParallelOps.threadCount);
+        mmWorkers = new MMWorker[ParallelOps.threadCount];
         MMUtils.printMessage("Running in Local Data LRT Mode");
 
         ParallelOps.worldProcsComm.barrier();
         timer.start();
         mmLoopLocalData(ParallelOps.threadRowCounts);
         timer.stop();
+
+        IntStream.range(0, ParallelOps.threadCount).forEach(i -> times.put(i, mmWorkers[i].getTime()));
+        ParallelOps.gather(times, ParallelOps.threadCount, 0);
+        IntStream.range(0, ParallelOps.threadCount*ParallelOps.worldProcsCount).forEach(i -> System.out
+                .println("Rank " + (i/ParallelOps.threadCount) + " Thread " + (i%ParallelOps.threadCount) + " comp time " + times.get(i) + " ms"));
+
         MMUtils.printMessage("Total time " + timer.elapsed(TimeUnit.MILLISECONDS) + " ms");
         ParallelOps.tearDownParallelism();
     }
 
-    private static void mmLoopLocalData(int[] threadRowCounts){
+    private static void mmLoopLocalData(int[] threadRowCounts) throws
+            MPIException {
         /* Start main mmLoopLocalData*/
         if (ParallelOps.threadCount > 1){
             launchHabaneroApp(
@@ -49,12 +64,14 @@ public class MMLRTLocal{
                                 Affinity.setAffinity(bitSet);
 
                                 MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize, threadRowCounts[threadIdx]);
+                                mmWorkers[threadIdx] = mmWorker;
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
                                 }
                             }));
         } else {
             MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize, threadRowCounts[0]);
+            mmWorkers[0] = mmWorker;
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }

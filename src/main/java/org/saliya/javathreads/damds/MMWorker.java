@@ -65,12 +65,16 @@ public class MMWorker {
     }
 
     public void run() {
-//        timer.start();
+        timer.start();
         MatrixUtils
                 .matrixMultiply(partialBofZ, preX, threadRowCount,
                         targetDimension, globalColCount, blockSize, partialMM);
-//        timer.stop();
-//        time += timer.elapsed(TimeUnit.MILLISECONDS);
-//        timer.reset();
+        timer.stop();
+        time += timer.elapsed(TimeUnit.MILLISECONDS);
+        timer.reset();
+    }
+
+    public long getTime(){
+        return time;
     }
 }
