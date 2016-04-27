@@ -3,10 +3,12 @@ package org.saliya.javathreads.damds;
 import com.google.common.base.Stopwatch;
 import org.saliya.javathreads.MatrixUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class MMWorker {
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
     int threadIdx;
     double[][] partialBofZ;
     double[] preX;
@@ -84,12 +86,12 @@ public class MMWorker {
         return time;
     }
 
-    public void setThreadStartAndEnd(Date threadStart, Date threadEdn) {
+    public void setThreadStartAndEnd(Date threadStart, Date threadEnd) {
         this.threadStart = threadStart;
         this.threadEnd = threadEnd;
     }
 
     public String getTimeString(){
-        return "threadStart " + threadStart + " threadEnd " + threadEnd + " compStart " + start + " compEnd "  +end;
+        return "threadStart " + sdf.format(threadStart) + " threadEnd " + sdf.format(threadEnd) + " compStart " + sdf.format(start) + " compEnd "  +sdf.format(end);
     }
 }
