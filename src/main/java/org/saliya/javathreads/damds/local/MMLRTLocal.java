@@ -40,8 +40,7 @@ public class MMLRTLocal{
 
         IntStream.range(0, ParallelOps.threadCount).forEach(i -> times.put(i, mmWorkers[i].getTime()));
         ParallelOps.gather(times, ParallelOps.threadCount, 0);
-        IntStream.range(0, ParallelOps.threadCount*ParallelOps.worldProcsCount).forEach(i -> System.out
-                .println("Rank " + (i/ParallelOps.threadCount) + " Thread " + (i%ParallelOps.threadCount) + " comp time " + times.get(i) + " ms"));
+        IntStream.range(0, ParallelOps.threadCount*ParallelOps.worldProcsCount).forEach(i -> MMUtils.printMessage("Rank " + (i/ParallelOps.threadCount) + " Thread " + (i%ParallelOps.threadCount) + " comp time " + times.get(i) + " ms"));
 
         MMUtils.printMessage("Total time " + timer.elapsed(TimeUnit.MILLISECONDS) + " ms");
         ParallelOps.tearDownParallelism();
