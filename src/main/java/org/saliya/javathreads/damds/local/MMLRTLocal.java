@@ -1,5 +1,6 @@
 package org.saliya.javathreads.damds.local;
 
+import com.google.common.base.Stopwatch;
 import mpi.MPIException;
 import org.saliya.javathreads.damds.*;
 
@@ -7,7 +8,15 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-public class MMLRTLocal extends MMLRT{
+import static edu.rice.hj.Module0.launchHabaneroApp;
+import static edu.rice.hj.Module1.forallChunked;
+
+public class MMLRTLocal{
+    private static int targetDimension = 3;
+    private static int blockSize = 64;
+    private static int iterations;
+    private static int globalColCount;
+    private static Stopwatch timer;
 
     public static void main(String[] args)
             throws MPIException, InterruptedException, IOException {
@@ -17,9 +26,56 @@ public class MMLRTLocal extends MMLRT{
         ParallelOps.worldProcsComm.barrier();
         timer.start();
         mmLoopLocalData(ParallelOps.threadRowCounts);
-        ParallelOps.worldProcsComm.barrier();
         timer.stop();
         MMUtils.printMessage("Total time " + timer.elapsed(TimeUnit.MILLISECONDS) + " ms");
         ParallelOps.tearDownParallelism();
+    }
+
+    private static void mmLoopLocalData(int[] threadRowCounts){
+        /* Start main mmLoopLocalData*/
+        if (ParallelOps.threadCount > 1){
+            launchHabaneroApp(
+                    () -> forallChunked(
+                            0, ParallelOps.threadCount - 1,
+                            (threadIdx) -> {
+                                MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize, threadRowCounts[threadIdx]);
+                                for (int itr = 0; itr < iterations; ++itr) {
+                                    mmWorker.run();
+                                }
+                            }));
+        } else {
+            MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize, threadRowCounts[0]);
+            for (int itr = 0; itr < iterations; ++itr) {
+                mmWorker.run();
+            }
+        }
+    }
+
+    public static void setup(String[] args) throws MPIException, IOException {
+         /* Set configuration options */
+        parseArgs(args);
+
+        /* Set up parallelism */
+        ParallelOps.setupParallelism(args);
+        ParallelOps.setParallelDecomposition(globalColCount, targetDimension);
+
+        /* Initialize timers */
+        initializeTimers();
+    }
+
+    private static void initializeTimers(){
+        timer = Stopwatch.createUnstarted();
+    }
+
+    private static void parseArgs(String[] args){
+        /* Set configuration options */
+        iterations = Integer.parseInt(args[0]);
+        globalColCount = Integer.parseInt(args[1]);
+        ParallelOps.nodeCount = Integer.parseInt(args[2]);
+        blockSize = (args.length > 3) ? Integer.parseInt(args[3]) : 64;
+        ParallelOps.threadCount = (args.length > 4) ? Integer.parseInt(args[4]) : 1;
+        ParallelOps.mmapScratchDir = (args.length > 5) ? args[5] : "/dev/shm";
+
+        ParallelOps.mmapsPerNode = 1;
     }
 }
