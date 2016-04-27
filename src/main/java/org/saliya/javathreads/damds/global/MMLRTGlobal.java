@@ -6,7 +6,7 @@ import org.saliya.javathreads.damds.*;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
-public class MMFJGlobalLRT extends MMLRT{
+public class MMLRTGlobal extends MMLRT{
     static double [][][] threadPartialBofZ;
     static double [] preX;
     static double [][] threadPartialMM;

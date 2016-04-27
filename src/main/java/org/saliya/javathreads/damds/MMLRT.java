@@ -11,6 +11,7 @@ import static edu.rice.hj.Module1.forallChunked;
 public class MMLRT extends MM {
     public static void mmLoopGlobalData(double[][][] threadPartialBofZ, double[] preX,
                                         double[][] threadPartialMM) throws MPIException {
+
         /* Start main mmLoopLocalData*/
         if (ParallelOps.threadCount > 1){
             timer.start();
@@ -57,7 +58,7 @@ public class MMLRT extends MM {
         MMUtils.printMessage("Total time " + sumTime +" ms compute " +
                 sumCompTime + " ms");
     }
-    public static void mmLoopLocalData() throws MPIException {
+    public static void mmLoopLocalData(int[] threadRowCounts) throws MPIException {
         /* Start main mmLoopLocalData*/
         if (ParallelOps.threadCount > 1){
             timer.start();
@@ -66,7 +67,7 @@ public class MMLRT extends MM {
                     () -> forallChunked(
                             0, ParallelOps.threadCount - 1,
                             (threadIdx) -> {
-                                MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize);
+                                MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize, threadRowCounts[threadIdx]);
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
                                 }
@@ -76,7 +77,7 @@ public class MMLRT extends MM {
         } else {
             timer.start();
             compTimer.start();
-            MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize);
+            MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize, threadRowCounts[0]);
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }

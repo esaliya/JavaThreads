@@ -13,6 +13,8 @@ public class MMWorker {
     int targetDimension;
     int blockSize;
 
+    int threadRowCount;
+
     Stopwatch compInternalTimer;
 
     public MMWorker(int threadIdx, double[][] partialBofZ, double[] preX,
@@ -25,14 +27,15 @@ public class MMWorker {
         this.globalColCount = globalColCount;
         this.targetDimension = targetDimension;
         this.blockSize = blockSize;
+
     }
 
-    public MMWorker(int threadIdx, int globalColCount, int targetDimension, int blockSize){
+    public MMWorker(int threadIdx, int globalColCount, int targetDimension, int blockSize, int threadRowCount){
         this.threadIdx = threadIdx;
         this.globalColCount = globalColCount;
         this.targetDimension = targetDimension;
         this.blockSize = blockSize;
-
+        this.threadRowCount = threadRowCount;
         /* Allocate arrays */
         allocateArrays();
 
@@ -52,13 +55,13 @@ public class MMWorker {
 
     private void allocateArrays() {
         preX = new double[globalColCount*targetDimension];
-        partialMM = new double[ParallelOps.threadRowCounts[threadIdx] * targetDimension];
-        partialBofZ = new double[ParallelOps.threadRowCounts[threadIdx]][ParallelOps.globalColCount];
+        partialMM = new double[threadRowCount * targetDimension];
+        partialBofZ = new double[threadRowCount][globalColCount];
     }
 
     public void run() {
         MatrixUtils
-                .matrixMultiply(partialBofZ, preX, ParallelOps.threadRowCounts[threadIdx],
+                .matrixMultiply(partialBofZ, preX, threadRowCount,
                         targetDimension, globalColCount, blockSize, partialMM);
     }
 }

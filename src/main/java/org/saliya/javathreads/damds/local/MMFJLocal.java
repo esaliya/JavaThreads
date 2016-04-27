@@ -18,7 +18,7 @@ public class MMFJLocal extends MMFJ{
 
         MMWorker[] workers = new MMWorker[ParallelOps.threadCount];
         IntStream.range(0, ParallelOps.threadCount).forEach(i -> workers[i] =
-                new MMWorker(i, globalColCount, targetDimension, blockSize));
+                new MMWorker(i, globalColCount, targetDimension, blockSize, ParallelOps.threadRowCounts[i]));
 
         ParallelOps.worldProcsComm.barrier();
         mmLoopLocalData(workers);

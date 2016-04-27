@@ -6,7 +6,7 @@ import org.saliya.javathreads.damds.*;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
-public class MMFJLocalLRT extends MMLRT{
+public class MMLRTLocal extends MMLRT{
 
     public static void main(String[] args)
             throws MPIException, InterruptedException, IOException {
@@ -14,7 +14,7 @@ public class MMFJLocalLRT extends MMLRT{
         MMUtils.printMessage("Running in Local Data LRT Mode");
 
         ParallelOps.worldProcsComm.barrier();
-        mmLoopLocalData();
+        mmLoopLocalData(ParallelOps.threadRowCounts);
         ParallelOps.tearDownParallelism();
     }
 }
