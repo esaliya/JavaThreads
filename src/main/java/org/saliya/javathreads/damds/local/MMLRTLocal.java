@@ -87,8 +87,6 @@ public class MMLRTLocal{
         ParallelOps.setupParallelism(args);
         ParallelOps.setParallelDecomposition(globalColCount, targetDimension);
         
-        threadCount = threadCount;
-
         /* Initialize timers */
         initializeTimers();
     }
@@ -104,6 +102,7 @@ public class MMLRTLocal{
         ParallelOps.nodeCount = Integer.parseInt(args[2]);
         blockSize = (args.length > 3) ? Integer.parseInt(args[3]) : 64;
         threadCount = (args.length > 4) ? Integer.parseInt(args[4]) : 1;
+        ParallelOps.threadCount = threadCount;
         ParallelOps.mmapScratchDir = (args.length > 5) ? args[5] : "/dev/shm";
 
         ParallelOps.mmapsPerNode = 1;
