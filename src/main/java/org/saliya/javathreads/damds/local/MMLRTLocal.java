@@ -79,11 +79,14 @@ public class MMLRTLocal{
                                 mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
                             }));
         } else {
+            Date threadStart = new Date();
             MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize, threadRowCounts[0]);
             mmWorkers[0] = mmWorker;
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }
+            Date threadEnd = new Date();
+            mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
         }
     }
 
