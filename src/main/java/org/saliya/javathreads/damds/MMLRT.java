@@ -61,40 +61,36 @@ public class MMLRT extends MM {
     public static void mmLoopLocalData(int[] threadRowCounts) throws MPIException {
         /* Start main mmLoopLocalData*/
         if (ParallelOps.threadCount > 1){
-            timer.start();
-            compTimer.start();
             launchHabaneroApp(
                     () -> forallChunked(
                             0, ParallelOps.threadCount - 1,
                             (threadIdx) -> {
                                 MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize, threadRowCounts[threadIdx]);
+                                if (threadIdx == 0) {
+                                    compTimer.start();
+                                }
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
                                 }
+                                if (threadIdx == 0) {
+                                    compTimer.stop();
+                                }
                             }));
-            compTimer.stop();
-            timer.stop();
         } else {
-            timer.start();
-            compTimer.start();
             MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize, threadRowCounts[0]);
+            compTimer.start();
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }
-            compTimer.stop();
             timer.stop();
         }
-
-        time = timer.elapsed(TimeUnit.MILLISECONDS);
-        sumTime += time;
 
         compTime = compTimer.elapsed(TimeUnit.MILLISECONDS);
         sumCompTime +=compTime;
 
-        timer.reset();
         compTimer.reset();
 
-        MMUtils.printMessage("Total time " + sumTime +" ms compute " +
+        MMUtils.printMessage("Compute " +
                 sumCompTime + " ms");
     }
 }

@@ -9,11 +9,11 @@ import java.util.stream.IntStream;
 public abstract class MM {
     protected static int targetDimension = 3;
     protected static int blockSize = 64;
-    static Stopwatch timer;
+    protected static Stopwatch timer;
     static Stopwatch compTimer;
 
-    static long sumTime = 0L, sumCompTime = 0L;
-    static long time = 0L, compTime = 0L;
+    protected static long sumTime = 0L, sumCompTime = 0L;
+    protected static long time = 0L, compTime = 0L;
 
     static int iterations;
     protected static int globalColCount;
