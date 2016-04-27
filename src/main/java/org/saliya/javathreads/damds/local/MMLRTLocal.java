@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -42,8 +43,12 @@ public class MMLRTLocal{
 
         IntStream.range(0, threadCount).forEach(i -> times.put(i, mmWorkers[i].getTime()));
         ParallelOps.gather(times, threadCount, 0);
-        IntStream.range(0, threadCount*ParallelOps.worldProcsCount).forEach(i -> MMUtils.printMessage("Rank " + (i/threadCount) + " Thread " + (i%threadCount) + " comp time " + times.get(i) + " ms"));
+//        IntStream.range(0, threadCount*ParallelOps.worldProcsCount).forEach(i -> MMUtils.printMessage("Rank " + (i/threadCount) + " Thread " + (i%threadCount) + " comp time " + times.get(i) + " ms" ));
 
+
+        IntStream.range(0, threadCount).forEach(i -> {
+            System.out.println("Rank " + ParallelOps.worldProcRank + " Thread " + i  + " " + mmWorkers[i].getTimeString());
+        });
         MMUtils.printMessage("Total time " + timer.elapsed(TimeUnit.MILLISECONDS) + " ms");
         ParallelOps.tearDownParallelism();
     }
@@ -56,6 +61,7 @@ public class MMLRTLocal{
                     () -> forallChunked(
                             0, threadCount - 1,
                             (threadIdx) -> {
+                                Date threadStart = new Date();
                                 BitSet bitSet = new BitSet(48);
                                 // TODO - let's hard code for juliet 12x2 for now
                                 bitSet.set(((ParallelOps.worldProcRank%2) * 12) +
@@ -69,6 +75,8 @@ public class MMLRTLocal{
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
                                 }
+                                Date threadEnd = new Date();
+                                mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
                             }));
         } else {
             MMWorker mmWorker = new MMWorker(0, globalColCount, targetDimension, blockSize, threadRowCounts[0]);

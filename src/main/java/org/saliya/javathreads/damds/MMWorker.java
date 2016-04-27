@@ -3,6 +3,7 @@ package org.saliya.javathreads.damds;
 import com.google.common.base.Stopwatch;
 import org.saliya.javathreads.MatrixUtils;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class MMWorker {
@@ -19,6 +20,9 @@ public class MMWorker {
 
     Stopwatch timer;
     long time = 0L;
+    Date start, end;
+    Date threadStart, threadEnd;
+    private Date threadStartAndEnd;
 
     public MMWorker(int threadIdx, double[][] partialBofZ, double[] preX,
                     double[] partialMM,
@@ -65,6 +69,7 @@ public class MMWorker {
     }
 
     public void run() {
+        start = new Date();
         timer.start();
         MatrixUtils
                 .matrixMultiply(partialBofZ, preX, threadRowCount,
@@ -72,9 +77,19 @@ public class MMWorker {
         timer.stop();
         time += timer.elapsed(TimeUnit.MILLISECONDS);
         timer.reset();
+        end = new Date();
     }
 
     public long getTime(){
         return time;
+    }
+
+    public void setThreadStartAndEnd(Date threadStart, Date threadEdn) {
+        this.threadStart = threadStart;
+        this.threadEnd = threadEnd;
+    }
+
+    public String getTimeString(){
+        return "threadStart " + threadStart + " threadEnd " + threadEnd + " compStart " + start + " compEnd "  +end;
     }
 }
