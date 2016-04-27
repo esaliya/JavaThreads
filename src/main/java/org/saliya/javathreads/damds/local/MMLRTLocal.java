@@ -2,9 +2,11 @@ package org.saliya.javathreads.damds.local;
 
 import com.google.common.base.Stopwatch;
 import mpi.MPIException;
+import net.openhft.affinity.Affinity;
 import org.saliya.javathreads.damds.*;
 
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -38,6 +40,14 @@ public class MMLRTLocal{
                     () -> forallChunked(
                             0, ParallelOps.threadCount - 1,
                             (threadIdx) -> {
+                                BitSet bitSet = new BitSet(48);
+                                // TODO - let's hard code for juliet 12x2 for now
+                                bitSet.set(((ParallelOps.worldProcRank%2) * 12) +
+                                        threadIdx);
+                                bitSet.set(((ParallelOps.worldProcRank%2) * 24) +
+                                        threadIdx + 24);
+                                Affinity.setAffinity(bitSet);
+
                                 MMWorker mmWorker = new MMWorker(threadIdx, globalColCount, targetDimension, blockSize, threadRowCounts[threadIdx]);
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
