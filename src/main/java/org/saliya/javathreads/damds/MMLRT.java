@@ -82,7 +82,7 @@ public class MMLRT extends MM {
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }
-            timer.stop();
+            compTimer.stop();
         }
 
         compTime = compTimer.elapsed(TimeUnit.MILLISECONDS);
