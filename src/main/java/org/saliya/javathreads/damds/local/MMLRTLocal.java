@@ -21,6 +21,7 @@ public class MMLRTLocal{
     private static int blockSize = 64;
     private static int iterations;
     private static int globalColCount;
+    private static int threadCount;
     private static Stopwatch timer;
 
     private static LongBuffer times;
@@ -29,18 +30,19 @@ public class MMLRTLocal{
     public static void main(String[] args)
             throws MPIException, InterruptedException, IOException {
         setup(args);
-        times = MPI.newLongBuffer(ParallelOps.worldProcsCount * ParallelOps.threadCount);
-        mmWorkers = new MMWorker[ParallelOps.threadCount];
+        times = MPI.newLongBuffer(ParallelOps.worldProcsCount * threadCount);
+        mmWorkers = new MMWorker[threadCount];
         MMUtils.printMessage("Running in Local Data LRT Mode");
 
         ParallelOps.worldProcsComm.barrier();
         timer.start();
         mmLoopLocalData(ParallelOps.threadRowCounts);
+        ParallelOps.worldProcsComm.barrier();
         timer.stop();
 
-        IntStream.range(0, ParallelOps.threadCount).forEach(i -> times.put(i, mmWorkers[i].getTime()));
-        ParallelOps.gather(times, ParallelOps.threadCount, 0);
-        IntStream.range(0, ParallelOps.threadCount*ParallelOps.worldProcsCount).forEach(i -> MMUtils.printMessage("Rank " + (i/ParallelOps.threadCount) + " Thread " + (i%ParallelOps.threadCount) + " comp time " + times.get(i) + " ms"));
+        IntStream.range(0, threadCount).forEach(i -> times.put(i, mmWorkers[i].getTime()));
+        ParallelOps.gather(times, threadCount, 0);
+        IntStream.range(0, threadCount*ParallelOps.worldProcsCount).forEach(i -> MMUtils.printMessage("Rank " + (i/threadCount) + " Thread " + (i%threadCount) + " comp time " + times.get(i) + " ms"));
 
         MMUtils.printMessage("Total time " + timer.elapsed(TimeUnit.MILLISECONDS) + " ms");
         ParallelOps.tearDownParallelism();
@@ -49,10 +51,10 @@ public class MMLRTLocal{
     private static void mmLoopLocalData(int[] threadRowCounts) throws
             MPIException {
         /* Start main mmLoopLocalData*/
-        if (ParallelOps.threadCount > 1){
+        if (threadCount > 1){
             launchHabaneroApp(
                     () -> forallChunked(
-                            0, ParallelOps.threadCount - 1,
+                            0, threadCount - 1,
                             (threadIdx) -> {
                                 BitSet bitSet = new BitSet(48);
                                 // TODO - let's hard code for juliet 12x2 for now
@@ -84,6 +86,8 @@ public class MMLRTLocal{
         /* Set up parallelism */
         ParallelOps.setupParallelism(args);
         ParallelOps.setParallelDecomposition(globalColCount, targetDimension);
+        
+        threadCount = threadCount;
 
         /* Initialize timers */
         initializeTimers();
@@ -99,7 +103,7 @@ public class MMLRTLocal{
         globalColCount = Integer.parseInt(args[1]);
         ParallelOps.nodeCount = Integer.parseInt(args[2]);
         blockSize = (args.length > 3) ? Integer.parseInt(args[3]) : 64;
-        ParallelOps.threadCount = (args.length > 4) ? Integer.parseInt(args[4]) : 1;
+        threadCount = (args.length > 4) ? Integer.parseInt(args[4]) : 1;
         ParallelOps.mmapScratchDir = (args.length > 5) ? args[5] : "/dev/shm";
 
         ParallelOps.mmapsPerNode = 1;
