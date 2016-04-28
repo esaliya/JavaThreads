@@ -36,6 +36,7 @@ public class MMWorker {
         this.globalColCount = globalColCount;
         this.targetDimension = targetDimension;
         this.blockSize = blockSize;
+        timer = Stopwatch.createUnstarted();
 
     }
 
