@@ -28,7 +28,7 @@ public class MMWorker {
 
     public MMWorker(int threadIdx, double[][] partialBofZ, double[] preX,
                     double[] partialMM,
-                    int globalColCount, int targetDimension, int blockSize) {
+                    int globalColCount, int targetDimension, int blockSize, int threadRowCount) {
         this.threadIdx = threadIdx;
         this.partialBofZ = partialBofZ;
         this.preX = preX;
@@ -36,6 +36,7 @@ public class MMWorker {
         this.globalColCount = globalColCount;
         this.targetDimension = targetDimension;
         this.blockSize = blockSize;
+        this.threadRowCount = threadRowCount;
         timer = Stopwatch.createUnstarted();
 
     }

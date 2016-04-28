@@ -46,7 +46,7 @@ public class MMLRTGlobal{
 
         ParallelOps.worldProcsComm.barrier();
         timer.start();
-        mmLoopGlobalData(threadPartialBofZ, preX, threadPartialMM);
+        mmLoopGlobalData(threadPartialBofZ, preX, threadPartialMM, ParallelOps.threadRowCounts);
         ParallelOps.worldProcsComm.barrier();
         timer.stop();
 
@@ -64,7 +64,7 @@ public class MMLRTGlobal{
     }
 
     public static void mmLoopGlobalData(double[][][] threadPartialBofZ, double[] preX,
-                                        double[][] threadPartialMM) throws MPIException {
+                                        double[][] threadPartialMM, int[] threadRowCounts) throws MPIException {
 
         /* Start main mmLoopLocalData*/
         if (ParallelOps.threadCount > 1){
@@ -85,7 +85,7 @@ public class MMLRTGlobal{
                                         (threadIdx, threadPartialBofZ[threadIdx], preX,
                                                 threadPartialMM[threadIdx],
                                                 globalColCount, targetDimension,
-                                                blockSize);
+                                                blockSize, threadRowCounts[threadIdx]);
                                 mmWorkers[threadIdx] = mmWorker;
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
@@ -99,7 +99,7 @@ public class MMLRTGlobal{
                     (0, threadPartialBofZ[0], preX,
                             threadPartialMM[0],
                             globalColCount, targetDimension,
-                            blockSize);
+                            blockSize, threadRowCounts[0]);
             mmWorkers[0] = mmWorker;
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
