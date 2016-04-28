@@ -72,6 +72,7 @@ public class MMWorker {
     }
 
     public void run() {
+        System.out.println("****" + globalColCount + " " +threadRowCount);
         start = new Date();
         timer.start();
         MatrixUtils
