@@ -94,14 +94,18 @@ public class MMLRTGlobal{
                                 mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
                             }));
         } else {
+            Date threadStart = new Date();
             MMWorker mmWorker = new MMWorker
                     (0, threadPartialBofZ[0], preX,
                             threadPartialMM[0],
                             globalColCount, targetDimension,
                             blockSize);
+            mmWorkers[0] = mmWorker;
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }
+            Date threadEnd = new Date();
+            mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
         }
     }
 
