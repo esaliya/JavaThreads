@@ -1,6 +1,7 @@
 package org.saliya.javathreads.damds.global;
 
 import com.google.common.base.Stopwatch;
+import mpi.MPI;
 import mpi.MPIException;
 import net.openhft.affinity.Affinity;
 import org.saliya.javathreads.damds.*;
@@ -33,6 +34,9 @@ public class MMLRTGlobal{
     public static void main(String[] args)
         throws MPIException, InterruptedException, IOException {
         setup(args);
+        times = MPI.newLongBuffer(ParallelOps.worldProcsCount * threadCount);
+        mmWorkers = new MMWorker[threadCount];
+
         MMUtils.printMessage("Running in Global Data LRT Mode");
 
         /* Allocate global arrays */
