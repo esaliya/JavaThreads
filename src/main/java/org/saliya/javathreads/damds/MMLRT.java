@@ -24,7 +24,7 @@ public class MMLRT extends MM {
                                         (threadIdx, threadPartialBofZ[threadIdx], preX,
                                                 threadPartialMM[threadIdx],
                                                 globalColCount, targetDimension,
-                                                blockSize);
+                                                blockSize, ParallelOps.threadRowCounts[threadIdx]);
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
                                 }
@@ -38,7 +38,7 @@ public class MMLRT extends MM {
                     (0, threadPartialBofZ[0], preX,
                             threadPartialMM[0],
                             globalColCount, targetDimension,
-                            blockSize);
+                            blockSize, ParallelOps.threadRowCounts[0]);
             for (int itr = 0; itr < iterations; ++itr) {
                 mmWorker.run();
             }
