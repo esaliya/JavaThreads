@@ -86,6 +86,7 @@ public class MMLRTGlobal{
                                                 threadPartialMM[threadIdx],
                                                 globalColCount, targetDimension,
                                                 blockSize);
+                                mmWorkers[threadIdx] = mmWorker;
                                 for (int itr = 0; itr < iterations; ++itr) {
                                     mmWorker.run();
                                 }
