@@ -78,7 +78,7 @@ public class MMFJGlobal{
                                 blockSize, threadRowCounts[threadIdx]));
 
         /* Start main mmLoopLocalData*/
-        /*for (int itr = 0; itr < iterations; ++itr)*/ {
+        for (int itr = 0; itr < iterations; ++itr) {
             if (ParallelOps.threadCount > 1) {
                 try {
                     launchHabaneroApp(
@@ -88,9 +88,7 @@ public class MMFJGlobal{
                                         Date threadStart = new Date();
                                         BitSet bitSet = new BitSet(48);
                                         // TODO - let's hard code for juliet 12x2 for now
-
-
-                                       /* bitSet.set(
+                                        bitSet.set(
                                                 ((ParallelOps.worldProcRank %
                                                         2) *
                                                         12) +
@@ -100,14 +98,11 @@ public class MMFJGlobal{
                                                         2) *
                                                         24) +
                                                         threadIdx + 24);
-                                        Affinity.setAffinity(bitSet);*/
+                                        Affinity.setAffinity(bitSet);
 
                                         MMWorker mmWorker =
                                                 mmWorkers[threadIdx];
-                                        for (int itr = 0; itr < iterations; ++itr) {
-
-                                            mmWorker.run();
-                                        }
+                                        mmWorker.run();
                                         Date threadEnd = new Date();
                                         mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
                                     }));
