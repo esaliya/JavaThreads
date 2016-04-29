@@ -78,7 +78,7 @@ public class MMFJGlobal{
                                 blockSize, threadRowCounts[threadIdx]));
 
         /* Start main mmLoopLocalData*/
-        for (int itr = 0; itr < iterations; ++itr) {
+        /*for (int itr = 0; itr < iterations; ++itr)*/ {
             if (ParallelOps.threadCount > 1) {
                 try {
                     launchHabaneroApp(
@@ -104,7 +104,10 @@ public class MMFJGlobal{
 
                                         MMWorker mmWorker =
                                                 mmWorkers[threadIdx];
-                                        mmWorker.run();
+                                        for (int itr = 0; itr < iterations; ++itr) {
+
+                                            mmWorker.run();
+                                        }
                                         Date threadEnd = new Date();
                                         mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
                                     }));
