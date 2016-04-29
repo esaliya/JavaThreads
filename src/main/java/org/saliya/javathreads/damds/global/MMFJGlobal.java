@@ -90,7 +90,7 @@ public class MMFJGlobal{
                                         // TODO - let's hard code for juliet 12x2 for now
 
 
-                                        bitSet.set(
+                                       /* bitSet.set(
                                                 ((ParallelOps.worldProcRank %
                                                         2) *
                                                         12) +
@@ -100,7 +100,7 @@ public class MMFJGlobal{
                                                         2) *
                                                         24) +
                                                         threadIdx + 24);
-                                        Affinity.setAffinity(bitSet);
+                                        Affinity.setAffinity(bitSet);*/
 
                                         MMWorker mmWorker =
                                                 mmWorkers[threadIdx];
