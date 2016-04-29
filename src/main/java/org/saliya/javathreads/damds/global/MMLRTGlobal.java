@@ -28,7 +28,7 @@ public class MMLRTGlobal{
     private static MMWorker[] mmWorkers;
 
     static double [][][] threadPartialBofZ;
-    static double [] preX;
+    static double [][] preX;
     static double [][] threadPartialMM;
 
     public static void main(String[] args)
@@ -63,7 +63,7 @@ public class MMLRTGlobal{
         ParallelOps.tearDownParallelism();
     }
 
-    public static void mmLoopGlobalData(double[][][] threadPartialBofZ, double[] preX,
+    public static void mmLoopGlobalData(double[][][] threadPartialBofZ, double[][] preX,
                                         double[][] threadPartialMM, int[] threadRowCounts) throws MPIException {
 
         /* Start main mmLoopLocalData*/
@@ -82,7 +82,7 @@ public class MMLRTGlobal{
                                 Affinity.setAffinity(bitSet);
 
                                 MMWorker mmWorker = new MMWorker
-                                        (threadIdx, threadPartialBofZ[threadIdx], preX,
+                                        (threadIdx, threadPartialBofZ[threadIdx], preX[threadIdx],
                                                 threadPartialMM[threadIdx],
                                                 globalColCount, targetDimension,
                                                 blockSize, threadRowCounts[threadIdx]);
@@ -96,7 +96,7 @@ public class MMLRTGlobal{
         } else {
             Date threadStart = new Date();
             MMWorker mmWorker = new MMWorker
-                    (0, threadPartialBofZ[0], preX,
+                    (0, threadPartialBofZ[0], preX[0],
                             threadPartialMM[0],
                             globalColCount, targetDimension,
                             blockSize, threadRowCounts[0]);
@@ -110,7 +110,7 @@ public class MMLRTGlobal{
     }
 
     private static void allocateArrays(int globalColCount) {
-        preX = new double[globalColCount*targetDimension];
+        preX = new double[ParallelOps.threadCount][globalColCount*targetDimension];
         threadPartialMM = new double[ParallelOps.threadCount][];
         threadPartialBofZ = new double[ParallelOps.threadCount][][];
         int threadRowCount;
@@ -123,8 +123,9 @@ public class MMLRTGlobal{
 
     private static void initializeData(int globalColCount) throws MPIException {
         /* Generate initial mapping of points */
+        IntStream.range(0, ParallelOps.threadCount).forEach(i ->
         MMUtils.generatePreX(globalColCount,
-                targetDimension, preX);
+                targetDimension, preX[i]));
 
         /* Set numbers for BofZ*/
         IntStream.range(0, ParallelOps.threadCount).forEach(
