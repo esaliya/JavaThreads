@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import static edu.rice.hj.Module0.launchHabaneroApp;
 import static edu.rice.hj.Module1.forallChunked;
 
-public class MMFJGlobal extends MMFJ{
+public class MMFJGlobal{
     private static int targetDimension = 3;
     private static int blockSize = 64;
     private static int iterations;
