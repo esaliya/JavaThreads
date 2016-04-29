@@ -80,29 +80,37 @@ public class MMFJGlobal{
         /* Start main mmLoopLocalData*/
         for (int itr = 0; itr < iterations; ++itr) {
             if (ParallelOps.threadCount > 1) {
-                launchHabaneroApp(
-                        () -> forallChunked(
-                                0, ParallelOps.threadCount - 1,
-                                (threadIdx) -> {
-                                    Date threadStart = new Date();
-                                    BitSet bitSet = new BitSet(48);
-                                    // TODO - let's hard code for juliet 12x2 for now
+                try {
+                    launchHabaneroApp(
+                            () -> forallChunked(
+                                    0, ParallelOps.threadCount - 1,
+                                    (threadIdx) -> {
+                                        Date threadStart = new Date();
+                                        BitSet bitSet = new BitSet(48);
+                                        // TODO - let's hard code for juliet 12x2 for now
 
-                                    bitSet.set(
-                                            ((ParallelOps.worldProcRank % 2) *
-                                                    12) +
-                                                    threadIdx);
-                                    bitSet.set(
-                                            ((ParallelOps.worldProcRank % 2) *
-                                                    24) +
-                                                    threadIdx + 24);
-                                    Affinity.setAffinity(bitSet);
 
-                                    MMWorker mmWorker = mmWorkers[threadIdx];
-                                    mmWorker.run();
-                                    Date threadEnd = new Date();
-                                    mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
-                                }));
+                                        bitSet.set(
+                                                ((ParallelOps.worldProcRank %
+                                                        2) *
+                                                        12) +
+                                                        threadIdx);
+                                        bitSet.set(
+                                                ((ParallelOps.worldProcRank %
+                                                        2) *
+                                                        24) +
+                                                        threadIdx + 24);
+                                        Affinity.setAffinity(bitSet);
+
+                                        MMWorker mmWorker =
+                                                mmWorkers[threadIdx];
+                                        mmWorker.run();
+                                        Date threadEnd = new Date();
+                                        mmWorker.setThreadStartAndEnd(threadStart, threadEnd);
+                                    }));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             } else {
                 Date threadStart = new Date();
                 MMWorker mmWorker = mmWorkers[0];
